@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.class.php,v 1.1 2013/12/10 23:27:57 cmanley Exp $
+* @version   $Id: Validator.class.php,v 1.2 2013/12/14 00:18:58 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -189,10 +189,19 @@ class Validator {
 	* @throws ValidationNamedCheckException
 	*/
 	public function validate(array $args) {
+		// Make sure keys in $args exist that have default values
+		$specs = $this->specs();
+		foreach ($specs as $k => $spec) {
+			if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+				$args[$k] = null;
+			}
+		}
 		if ($this->empty_delete) {
 			foreach ($args as $k => $v) {
 				if (is_null($v) || (is_string($v) && !strlen($v))) {
-					unset($args[$k]);
+					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { // don't delete arguments that have default values
+						unset($args[$k]);
+					}
 				}
 			}
 		}
@@ -205,7 +214,6 @@ class Validator {
 			}
 		}
 
-		$specs = $this->specs();
 		// If no spec exists, then return unvalidated arguments.
 		if (!$specs) {
 			return $args;
@@ -214,16 +222,23 @@ class Validator {
 		// Validate args
 		foreach ($args as $k => &$v) {
 			if ($specs->offsetExists($k)) {
-				$spec = $specs[$k];
-				if (!$spec->validate($v)) { // also applies before/after mutators to $v reference
-					throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
-				}
+				// nop
 			}
-			elseif (!$this->remove_extra) {
+			elseif ($this->remove_extra) {
 				unset($args[$k]);
 			}
 			elseif (!$this->allow_extra) {
 				throw new ValidationException("Unknown key '" . $this->prefix . $k . "'");
+			}
+			unset($v);
+		}
+		foreach ($specs as $k => $spec) {
+			$v = null;
+			if (array_key_exists($k, $args)) {
+				$v =& $args[$k];
+			}
+			if (!$spec->validate($v)) { // also applies defaults or before/after mutators to $v reference
+				throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
 			}
 			unset($v);
 		}

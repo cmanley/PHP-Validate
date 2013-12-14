@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.1 2013/12/10 23:27:57 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.2 2013/12/14 00:18:58 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -32,7 +32,6 @@ require_once(__DIR__ . '/Validation.class.php');
 *
 *	// Typical usage:
 *	$spec = new Validate\Spec(array(
-*		'description'	=> 'String with a lowercase "a"',
 *		'optional'		=> true,
 *		'validation'	=> (new Validate\Validation(array(
 *			'max_length'	=> 10,
@@ -45,7 +44,6 @@ require_once(__DIR__ . '/Validation.class.php');
 *
 *	// Lazy usage (Validation options instead of a "validation" key):
 *	$spec = new Validate\Spec(array(
-*		'description'	=> 'String with a lowercase "a"',
 *		'optional'		=> true,
 *		'max_length'	=> 10,
 *		'regex'			=> '/a/',
@@ -61,7 +59,8 @@ require_once(__DIR__ . '/Validation.class.php');
 class Spec {
 
 	protected $allow_empty = false;
-	protected $description;
+	protected $default;
+	//protected $description; // perhaps one day
 	protected $before;
 	protected $after;
 	protected $optional = false;
@@ -78,7 +77,7 @@ class Spec {
 	*	allow_empty	: boolean, allow empty strings to be validated and pass optional check
 	*	before		: callback that takes a reference to the value as argument so that it can mutate it before validation
 	*	after		: callback that takes a reference to the value as argument so that it can mutate it after validation
-	*	description : string
+	*	default		: any non-null value (even closures!); using this causes null arguments to bypass validation and callbacks.
 	*	optional	: boolean, if true, then null values are allowed
 	*	validation	: Validation object
 	* </pre>
@@ -105,6 +104,10 @@ class Spec {
 					}
 					$this->$key = $value;
 				}
+				elseif ($key == 'default') {
+					$this->$key = $value;
+				}
+				/*
 				elseif ($key == 'description') {
 					if (!is_null($value)) {
 						if (!is_string($value)) {
@@ -113,6 +116,7 @@ class Spec {
 						$this->$key = $value;
 					}
 				}
+				*/
 				// Process boolean options
 				elseif (in_array($key, array('allow_empty', 'optional'))) {
 					$this->$key = (boolean) $value;
@@ -172,9 +176,21 @@ class Spec {
 	*
 	* @return string|null
 	*/
+	public function getDefault() {
+		return $this->default;
+	}
+
+
+	/**
+	* Return the description option as passed into the constructor.
+	*
+	* @return string|null
+	*/
+	/*
 	public function description() {
 		return $this->description;
 	}
+	*/
 
 
 	/**
@@ -237,24 +253,29 @@ class Spec {
 		if (is_string($arg) && !strlen($arg) && !$this->allow_empty) {
 			$arg = null;
 		}
-		if (is_null($arg)) {
-			if (!$this->optional) {
-				$this->last_failure = 'mandatory';
-				return false;
-			}
+		if (is_null($arg) && !is_null($this->default)) {
+			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
 		}
 		else {
-			if ($this->before) {
-				call_user_func_array($this->before, array(&$arg));
-			}
-			if ($this->validation) {
-				if (!$this->validation->validate($arg)) {
-					$this->last_failure = $this->validation->getLastFailure();
+			if (is_null($arg)) {
+				if (!$this->optional) {
+					$this->last_failure = 'mandatory';
 					return false;
 				}
 			}
-			if ($this->after) {
-				call_user_func_array($this->after, array(&$arg));
+			else {
+				if ($this->before) {
+					call_user_func_array($this->before, array(&$arg));
+				}
+				if ($this->validation) {
+					if (!$this->validation->validate($arg)) {
+						$this->last_failure = $this->validation->getLastFailure();
+						return false;
+					}
+				}
+				if ($this->after) {
+					call_user_func_array($this->after, array(&$arg));
+				}
 			}
 		}
 		$this->last_failure = null;
@@ -272,24 +293,29 @@ class Spec {
 		if (is_string($arg) && !strlen($arg) && !$this->allow_empty) {
 			$arg = null;
 		}
-		if (is_null($arg)) {
-			if (!$this->optional) {
-				$this->last_failure = 'mandatory';
-				throw new ValidationCheckException('mandatory', $arg);
-			}
+		if (is_null($arg) && !is_null($this->default)) {
+			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
 		}
 		else {
-			if ($this->before) {
-				call_user_func_array($this->before, array(&$arg));
-			}
-			if ($this->validation) {
-				if (!$this->validation->validate($arg)) {
-					$this->last_failure = $this->validation->getLastFailure();
-					throw new ValidationCheckException($this->last_failure, $arg);
+			if (is_null($arg)) {
+				if (!$this->optional) {
+					$this->last_failure = 'mandatory';
+					throw new ValidationCheckException('mandatory', $arg);
 				}
 			}
-			if ($this->after) {
-				call_user_func_array($this->after, array(&$arg));
+			else {
+				if ($this->before) {
+					call_user_func_array($this->before, array(&$arg));
+				}
+				if ($this->validation) {
+					if (!$this->validation->validate($arg)) {
+						$this->last_failure = $this->validation->getLastFailure();
+						throw new ValidationCheckException($this->last_failure, $arg);
+					}
+				}
+				if ($this->after) {
+					call_user_func_array($this->after, array(&$arg));
+				}
 			}
 		}
 		$this->last_failure = null;
