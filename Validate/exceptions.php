@@ -5,7 +5,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.1 2013/12/10 23:27:57 cmanley Exp $
+* @version   $Id: exceptions.php,v 1.2 2013/12/14 00:17:42 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -71,8 +71,11 @@ class ValidationCheckException extends ValidationException {
 	* @return string
 	*/
 	public function getValueSimple() {
-		if (is_scalar($this->value)) {
-			return $this->value;
+		if (is_bool($this->value)) {
+			return $this->value ? 'true' : 'false';
+		}
+		elseif (is_scalar($this->value)) {
+			return gettype($this->value) . " '" . $this->value . "'";
 		}
 		return gettype($this->value);
 	}
