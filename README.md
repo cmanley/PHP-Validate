@@ -22,23 +22,23 @@ All the classes contain PHP-doc documentation, so for now, take a look at the co
 						'type'			=> 'string',
 						'max_length'	=> 2,
 						'max_length'	=> 30,
+					),
+					'birthdate' => array(
+						'type'	=> 'string',
+						'regex'	=> '#^[0-3]\d/[01]\d/\d{4}$#', // expect dd/mm/yyyy
+						'after'	=> function(&$value) { // want yyyy-mm-dd
+							if (is_string($value) && preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $value, $matches)) {
+								$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
+							}
+						},
+						'optional' => true,
+					),
+					'score' => array(
+						'types' => array('float', 'integer'),
+						'max_value'	=> 10,
+						'min_value'	=> 0,
+					),
 				),
-				'birthdate' => array(
-					'type'	=> 'string',
-					'regex'	=> '#^[0-3]\d/[01]\d/\d{4}$#', // expect dd/mm/yyyy
-					'after'	=> function(&$value) { // want yyyy-mm-dd
-						if (is_string($value) && preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $value, $matches)) {
-							$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
-						}
-					},
-					'optional' => true,
-				),
-				'score' => array(
-					'types' => array('float', 'integer'),
-					'max_value'	=> 10,
-					'min_value'	=> 0,
-				),
-			),
 			)))->validate($params);
 			// Insert $params into database here.
 		}
