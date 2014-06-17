@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.1 2013/12/10 23:27:57 cmanley Exp $
+* @version   $Id: Validation.class.php,v 1.2 2014/06/17 22:42:28 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -239,7 +239,7 @@ class Validation {
 				if (!(
 					is_scalar($arg)
 					&&
-					($this->nocase() ? in_array(mb_strtolower($arg), array_map('mb_strtolower', $this->allowed_values)) : in_array($arg, $this->allowed_values))
+					($this->nocase ? in_array(mb_strtolower($arg), array_map('mb_strtolower', $this->allowed_values)) : in_array($arg, $this->allowed_values))
 				)) {
 					$this->last_failure = 'allowed_values';
 					return false;
