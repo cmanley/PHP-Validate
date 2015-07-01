@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.2 2013/12/14 00:18:58 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.3 2015/07/01 17:26:47 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -33,6 +33,7 @@ require_once(__DIR__ . '/Validation.class.php');
 *	// Typical usage:
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
+*		'description'	=> 'Just an optional description',
 *		'validation'	=> (new Validate\Validation(array(
 *			'max_length'	=> 10,
 *			'regex'			=> '/a/',
@@ -60,7 +61,7 @@ class Spec {
 
 	protected $allow_empty = false;
 	protected $default;
-	//protected $description; // perhaps one day
+	protected $description;
 	protected $before;
 	protected $after;
 	protected $optional = false;
@@ -107,7 +108,6 @@ class Spec {
 				elseif ($key == 'default') {
 					$this->$key = $value;
 				}
-				/*
 				elseif ($key == 'description') {
 					if (!is_null($value)) {
 						if (!is_string($value)) {
@@ -116,7 +116,6 @@ class Spec {
 						$this->$key = $value;
 					}
 				}
-				*/
 				// Process boolean options
 				elseif (in_array($key, array('allow_empty', 'optional'))) {
 					$this->$key = (boolean) $value;
@@ -172,7 +171,7 @@ class Spec {
 
 
 	/**
-	* Return the description option as passed into the constructor.
+	* Return the option as passed into the constructor.
 	*
 	* @return string|null
 	*/
@@ -182,15 +181,13 @@ class Spec {
 
 
 	/**
-	* Return the description option as passed into the constructor.
+	* Return the option as passed into the constructor.
 	*
 	* @return string|null
 	*/
-	/*
 	public function description() {
 		return $this->description;
 	}
-	*/
 
 
 	/**
