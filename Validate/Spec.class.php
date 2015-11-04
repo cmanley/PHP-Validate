@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.3 2015/07/01 17:26:47 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.4 2015/11/04 03:24:46 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -100,10 +100,12 @@ class Spec {
 					}
 				}
 				elseif (($key == 'after') || ($key == 'before')) {
-					if (!is_callable($value)) {
-						throw new \InvalidArgumentException("The \"$key\" argument must be callable, such as a closure or a function name.");
+					if (!is_null($value)) {
+						if (!is_callable($value)) {
+							throw new \InvalidArgumentException("The \"$key\" argument must be callable, such as a closure or a function name.");
+						}
+						$this->$key = $value;
 					}
-					$this->$key = $value;
 				}
 				elseif ($key == 'default') {
 					$this->$key = $value;
