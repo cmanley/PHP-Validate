@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.4 2015/11/04 03:24:46 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.5 2016/02/16 02:54:43 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -30,7 +30,7 @@ require_once(__DIR__ . '/Validation.class.php');
 *
 * SYNOPSIS:
 *
-*	// Typical usage:
+*	// Typical creation:
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
 *		'description'	=> 'Just an optional description',
@@ -43,9 +43,23 @@ require_once(__DIR__ . '/Validation.class.php');
 *		))),
 *	));
 *
-*	// Lazy usage (Validation options instead of a "validation" key):
+*	// Lazy creation:
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
+*		'description'	=> 'Just an optional description',
+*		'validation'	=> array(
+*			'max_length'	=> 10,
+*			'regex'			=> '/a/',
+*			'callbacks'		=> array(
+*				'is_lc'	=> function($s) { return strtolower($s) == $s; },
+*			),
+*		),
+*	));
+*
+*	// Very lazy creation (Validation options instead of a "validation" key):
+*	$spec = new Validate\Spec(array(
+*		'optional'		=> true,
+*		'description'	=> 'Just an optional description',
 *		'max_length'	=> 10,
 *		'regex'			=> '/a/',
 *		'callbacks'		=> array(
@@ -53,6 +67,7 @@ require_once(__DIR__ . '/Validation.class.php');
 *		),
 *	));
 *
+*	// And finally validating something:
 *	print (int) $spec->validate("hay") . "\n";
 *
 * @package	cmanley
@@ -78,8 +93,9 @@ class Spec {
 	*	allow_empty	: boolean, allow empty strings to be validated and pass optional check
 	*	before		: callback that takes a reference to the value as argument so that it can mutate it before validation
 	*	after		: callback that takes a reference to the value as argument so that it can mutate it after validation
-	*	default		: any non-null value (even closures!); using this causes null arguments to bypass validation and callbacks.
+	*	default		: any non-null value (even closures!); using this causes null arguments to bypass validation and callbacks
 	*	optional	: boolean, if true, then null values are allowed
+	*	description	: optional description used in exception messages
 	*	validation	: Validation object
 	* </pre>
 	*
@@ -93,7 +109,10 @@ class Spec {
 			foreach ($args as $key => $value) {
 				if ($key == 'validation') {
 					if (!is_null($value)) {
-						if (!(is_object($value) && ($value instanceOf Validation))) {
+						if (is_array($value)) {
+							$value = new Validation($value);
+						}
+						elseif (!(is_object($value) && ($value instanceOf Validation))) {
 							throw new \InvalidArgumentException("The \"$key\" argument must be null or a Validation object");
 						}
 						$this->$key = $value;

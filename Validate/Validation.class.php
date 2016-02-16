@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.3 2015/02/03 22:35:14 cmanley Exp $
+* @version   $Id: Validation.class.php,v 1.5 2016/02/16 02:55:38 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -78,7 +78,7 @@ class Validation {
 	*
 	* The following options are supported:
 	* <pre>
-	*	nocase (boolean, make string checks case insensitive)
+	*	nocase (boolean, makes allowed_values check case insensitive)
 	* </pre>
 	*
 	* @param array $args associative array of validations and/or options
@@ -251,6 +251,23 @@ class Validation {
 	*/
 	public function validate($arg) {
 		if (!is_null($arg)) {
+			if ($this->types) {
+				$type = gettype($arg);
+				if (!(
+					in_array($type, $this->types)
+					||
+					(is_scalar($arg) && in_array('scalar', $this->types))
+				)) {
+					$this->last_failure = 'types';
+					return false;
+				}
+			}
+			if ($this->resource_type) {
+				if (!(is_resource($arg) && (get_resource_type($arg) == $this->resource_type))) {
+					$this->last_failure = 'resource_type';
+					return false;
+				}
+			}
 			if (!is_null($this->max_length)) {
 				if (!(is_scalar($arg) && (strlen($arg) <= $this->max_length))) {
 					$this->last_failure = 'max_length';
@@ -290,23 +307,6 @@ class Validation {
 			if ($this->isa) {
 				if (!(is_object($arg) && @is_a($arg, $this->isa))) {
 					$this->last_failure = 'isa';
-					return false;
-				}
-			}
-			if ($this->resource_type) {
-				if (!(is_resource($arg) && (get_resource_type($arg) == $this->resource_type))) {
-					$this->last_failure = 'resource_type';
-					return false;
-				}
-			}
-			if ($this->types) {
-				$type = gettype($arg);
-				if (!(
-					in_array($type, $this->types)
-					||
-					(is_scalar($arg) && in_array('scalar', $this->types))
-				)) {
-					$this->last_failure = 'types';
 					return false;
 				}
 			}

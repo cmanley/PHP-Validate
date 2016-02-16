@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.class.php,v 1.2 2013/12/14 00:18:58 cmanley Exp $
+* @version   $Id: Validator.class.php,v 1.4 2016/02/16 02:55:38 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -192,7 +192,8 @@ class Validator {
 		// Make sure keys in $args exist that have default values
 		$specs = $this->specs();
 		foreach ($specs as $k => $spec) {
-			if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+			//if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+			if (!array_key_exists($k, $args)) {
 				$args[$k] = null;
 			}
 		}
@@ -207,7 +208,7 @@ class Validator {
 		}
 		elseif ($this->empty_null) {
 			foreach ($args as $k => &$v) {
-				if (is_null($v) || (is_string($v) && !strlen($v))) {
+				if (is_string($v) && !strlen($v)) {
 					$v = null;
 				}
 				unset($v);

@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.class.php,v 1.1 2013/12/10 23:27:57 cmanley Exp $
+* @version   $Id: Specs.class.php,v 1.3 2016/02/16 02:55:38 cmanley Exp $
 * @package   cmanley
 */
 namespace Validate;
@@ -43,7 +43,7 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* @param array associative array of field name => Spec|boolean|array pairs
 	* @throws InvalidArgumentException
 	*/
-	public function __construct(array $pairs) {
+	public function __construct(array $pairs = array()) {
 		foreach ($pairs as $key => &$value) {
 			static::_checkKeyValuePair($key, $value);
 			unset($value);
