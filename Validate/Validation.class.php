@@ -8,9 +8,9 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.5 2016/02/16 02:55:38 cmanley Exp $
+* @version   $Id: Validation.class.php,v 1.6 2016/02/17 22:25:33 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -24,9 +24,8 @@ require_once(__DIR__ . '/exceptions.php');
 
 
 /**
-* Validation class.
-* Encapsulates validations and validates.
-* This class is designed to also be used stand-alone.
+* The Validation class encapsulates checks for validating single non-null values.
+* This class may be used stand-alone, but it is typically used as a parameter for the Spec constructor.
 *
 * @package	cmanley
 */
@@ -58,6 +57,9 @@ class Validation {
 	*
 	* Below are the supported validations, in the order that they are applied during validation.
 	* <pre>
+	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double')
+	*	types: array of allowed types (see type)
+	*	resource_type: only used if 'resource' is in 'types' array
 	*	max_length: max string length, for scalar types
 	*	min_length: min string length, for scalar types
 	*	mb_max_length: max multibyte string length, for scalar types
@@ -65,9 +67,6 @@ class Validation {
 	*	max_value: for numeric types
 	*	min_value: for numeric types
 	*	isa: allowed object type
-	*	resource_type: only used if 'resource' is in 'types' array
-	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double')
-	*	types: array of allowed types (see type)
 	*	regex: validation regex string, e.g. '/^.{1,50}$/s'
 	*	callback: boolean closure function that receives the value as argument
 	*	callbacks: associative array of boolean closure functions that receive the value as argument

@@ -9,9 +9,9 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.class.php,v 1.4 2016/02/16 02:55:38 cmanley Exp $
+* @version   $Id: Validator.class.php,v 1.5 2016/02/17 22:25:33 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -26,7 +26,8 @@ require_once(__DIR__ . '/Specs.class.php');
 
 
 /**
-* Encapsulates a field definition.
+* Validator objects use their internal Specs to validate and possibly modify (associative) arrays.
+* Typical arrays that often require validation are those from form submissions, reading CSV records, and function array-type arguments.
 *
 * SYNOPSIS
 *

@@ -8,9 +8,9 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.class.php,v 1.3 2016/02/16 02:55:38 cmanley Exp $
+* @version   $Id: Specs.class.php,v 1.4 2016/02/17 22:25:33 cmanley Exp $
 * @package   cmanley
 */
 namespace Validate;

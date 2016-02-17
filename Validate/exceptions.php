@@ -3,9 +3,9 @@
 * Contains the ValidationException based classes.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.2 2013/12/14 00:17:42 cmanley Exp $
+* @version   $Id: exceptions.php,v 1.3 2016/02/17 22:25:33 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;

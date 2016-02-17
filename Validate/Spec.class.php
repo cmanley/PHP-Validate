@@ -9,9 +9,9 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2013, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.5 2016/02/16 02:54:43 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.6 2016/02/17 22:25:33 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -25,8 +25,9 @@ require_once(__DIR__ . '/Validation.class.php');
 
 
 /**
-* Validation class.
-* Encapsulates a validation object, as well as some extra specification options, and can validate single values.
+* A Spec object encapsulates a Validation object as well as some extra attributes.
+* See the constructor documentation for all the possible parameters.
+* The Spec class is rarely used stand-alone since it is only able to validate a single value.
 *
 * SYNOPSIS:
 *
@@ -90,10 +91,10 @@ class Spec {
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_empty	: boolean, allow empty strings to be validated and pass optional check
+	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check
 	*	before		: callback that takes a reference to the value as argument so that it can mutate it before validation
 	*	after		: callback that takes a reference to the value as argument so that it can mutate it after validation
-	*	default		: any non-null value (even closures!); using this causes null arguments to bypass validation and callbacks
+	*	default		: 	any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
 	*	optional	: boolean, if true, then null values are allowed
 	*	description	: optional description used in exception messages
 	*	validation	: Validation object
@@ -182,7 +183,7 @@ class Spec {
 
 
 	/**
-	* Return the allow_empty option as passed into the constructor.
+	* Returns the value of the 'allow_empty' option as passed into the constructor.
 	*
 	* @return boolean
 	*/
@@ -192,7 +193,7 @@ class Spec {
 
 
 	/**
-	* Return the option as passed into the constructor.
+	* Returns the value of the 'default' option as passed into the constructor.
 	*
 	* @return string|null
 	*/
@@ -202,7 +203,7 @@ class Spec {
 
 
 	/**
-	* Return the option as passed into the constructor.
+	* Returns the value of the 'description' option as passed into the constructor.
 	*
 	* @return string|null
 	*/
@@ -232,7 +233,7 @@ class Spec {
 
 
 	/**
-	* Return the optional option as passed in the constructor.
+	* Returns the value of the 'optional' option as passed into the constructor.
 	*
 	* @return boolean
 	*/
@@ -242,7 +243,7 @@ class Spec {
 
 
 	/**
-	* Return the nocase validation as passed in the constructor.
+	* Return the value of the 'validation' option as passed into or created by the constructor.
 	*
 	* @return Validation|null
 	*/
@@ -252,9 +253,9 @@ class Spec {
 
 
 	/**
-	* Return the name of the check the last validation failed on.
+	* Returns the name of the check that the last validation failed on.
 	*
-	* @return string
+	* @return string|null
 	*/
 	public function getLastFailure() {
 		return $this->last_failure;
@@ -262,7 +263,9 @@ class Spec {
 
 
 	/**
-	* Validates the given argument.
+	* Validates the given argument reference.
+	* If 'before' or 'after' callback options were passed into the constructor,
+	* then these are applied to the argument in order to modify it in place, which is why it is passed by reference.
 	*
 	* @param mixed &$arg
 	* @return boolean
@@ -302,40 +305,14 @@ class Spec {
 
 
 	/**
-	* Validates the given argument and throws a ValidationCheckException on failure.
+	* This simply wraps the validate() method in order to throw a ValidationCheckException on failure instead of returning a boolean.
 	*
 	* @param mixed &$arg
 	* @throws ValidationCheckException
 	*/
 	public function validate_ex(&$arg) {
-		if (is_string($arg) && !strlen($arg) && !$this->allow_empty) {
-			$arg = null;
+		if (!$this->validate($arg)) {
+			throw new ValidationCheckException($this->getLastFailure(), $arg);
 		}
-		if (is_null($arg) && !is_null($this->default)) {
-			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
-		}
-		else {
-			if (is_null($arg)) {
-				if (!$this->optional) {
-					$this->last_failure = 'mandatory';
-					throw new ValidationCheckException('mandatory', $arg);
-				}
-			}
-			else {
-				if ($this->before) {
-					call_user_func_array($this->before, array(&$arg));
-				}
-				if ($this->validation) {
-					if (!$this->validation->validate($arg)) {
-						$this->last_failure = $this->validation->getLastFailure();
-						throw new ValidationCheckException($this->last_failure, $arg);
-					}
-				}
-				if ($this->after) {
-					call_user_func_array($this->after, array(&$arg));
-				}
-			}
-		}
-		$this->last_failure = null;
 	}
 }
