@@ -2,7 +2,7 @@ PHP-Validate
 ============
 
 PHP validation library.
-This is similar to Perl's [Params::Validate](http://search.cpan.org/~drolsky/Params-Validate-1.08/lib/Params/Validate.pm).
+This is similar to Perl's [Params::Validate](http://search.cpan.org/perldoc/Params::Validate).
 You can use it to validate almost anything, but typically it can be used for validating input from HTML forms, fields while reading CSV files, function parameters, ORM arrays, etc.
 
 ### Requirements:
