@@ -4,7 +4,7 @@
 * The Validation class is rarely used stand-alone as it is only able to validate a single value.
 *
 * @author   Craig Manley
-* @version  $Id: validation.php,v 1.1 2016/02/16 02:54:43 cmanley Exp $
+* @version  $Id: validation.php,v 1.2 2016/02/17 23:04:58 cmanley Exp $
 * @package  Validate
 */
 require_once(__DIR__ . '/../src/Validation.class.php');

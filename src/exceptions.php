@@ -5,7 +5,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.3 2016/02/17 22:25:33 cmanley Exp $
+* @version   $Id: exceptions.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;

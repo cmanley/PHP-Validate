@@ -165,4 +165,21 @@ class Test extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function testReturnValuesBeforeAfter() {
+		foreach (array('before', 'after') as $when) {
+			$spec = new Validate\Spec(array(
+				$when			=> function(&$x) {},	// void (null) result
+			));
+			$input = 'anything';
+			$this->assertTrue($spec->validate($input), "Using callback '$when' with void return value validates as true.");
+			$this->assertEquals(null, $spec->getLastFailure(), 'Check last failure');
+			$spec = new Validate\Spec(array(
+				$when			=> function(&$x) { return false; },
+			));
+			$input = 'anything';
+			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as false.");
+			$this->assertEquals("callback $when", $spec->getLastFailure(), 'Check last failure');
+		}
+	}
+
 }

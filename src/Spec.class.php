@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.6 2016/02/17 22:25:33 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.2 2016/02/21 02:08:48 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -92,11 +92,11 @@ class Spec {
 	* The following options are supported:
 	* <pre>
 	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check
-	*	before		: callback that takes a reference to the value as argument so that it can mutate it before validation
-	*	after		: callback that takes a reference to the value as argument so that it can mutate it after validation
-	*	default		: 	any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
+	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
+	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
+	*	default		: Any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
 	*	optional	: boolean, if true, then null values are allowed
-	*	description	: optional description used in exception messages
+	*	description	: Optional description that can be used by user code.
 	*	validation	: Validation object
 	* </pre>
 	*
@@ -286,7 +286,11 @@ class Spec {
 			}
 			else {
 				if ($this->before) {
-					call_user_func_array($this->before, array(&$arg));
+					$x = call_user_func_array($this->before, array(&$arg)); // possible return values are: false, null (void)
+					if ($x === false) {
+						$this->last_failure = 'callback before';
+						return false;
+					}
 				}
 				if ($this->validation) {
 					if (!$this->validation->validate($arg)) {
@@ -295,7 +299,11 @@ class Spec {
 					}
 				}
 				if ($this->after) {
-					call_user_func_array($this->after, array(&$arg));
+					$x = call_user_func_array($this->after, array(&$arg)); // possible return values are: false, null (void)
+					if ($x === false) {
+						$this->last_failure = 'callback after';
+						return false;
+					}
 				}
 			}
 		}

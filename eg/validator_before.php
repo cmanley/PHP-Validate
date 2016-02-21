@@ -4,7 +4,7 @@
 * The 'before' function is executed before other spec validations have been performed.
 *
 * @author   Craig Manley
-* @version  $Id: validator_before.php,v 1.1 2016/02/16 02:54:43 cmanley Exp $
+* @version  $Id: validator_before.php,v 1.2 2016/02/17 23:04:58 cmanley Exp $
 * @package  Validate
 */
 require_once(__DIR__ . '/../src/Validator.class.php');
