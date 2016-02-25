@@ -192,10 +192,12 @@ class Validator {
 	public function validate(array $args) {
 		// Make sure keys in $args exist that have default values
 		$specs = $this->specs();
-		foreach ($specs as $k => $spec) {
-			//if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
-			if (!array_key_exists($k, $args)) {
-				$args[$k] = null;
+		if ($specs) {
+			foreach ($specs as $k => $spec) {
+				//if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+				if (!array_key_exists($k, $args)) {
+					$args[$k] = null;
+				}
 			}
 		}
 		if ($this->empty_delete) {
