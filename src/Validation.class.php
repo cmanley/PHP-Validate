@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
+* @version   $Id: Validation.class.php,v 1.2 2016/03/15 15:02:19 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -310,7 +310,7 @@ class Validation {
 				}
 			}
 			if ($this->regex) {
-				if (!(is_scalar($arg) && preg_match($this->regex, $arg))) {
+				if (!(is_scalar($arg) && preg_match($this->regex, is_bool($arg) ? intval($arg) : $arg))) {
 					$this->last_failure = 'regex';
 					return false;
 				}
