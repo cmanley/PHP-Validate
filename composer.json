@@ -1,8 +1,8 @@
 {
-    "name": "petski/php-validate",
+    "name": "cmanley/php-validate",
     "version": "1.0.0",
     "dist": {
-        "url": "https://github.com/petski/PHP-Validate/archive/5bc3a1edebbe668a85ea92735a9fa1abc012cc13.zip",
+        "url": "https://github.com/cmanley/PHP-Validate/archive/5ffe04ae9eeba2dd5f9b3d70c00b6625e1a1c44a.zip",
         "type": "zip"
     }
 }
