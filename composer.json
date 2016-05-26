@@ -2,7 +2,7 @@
     "name": "petski/php-validate",
     "version": "1.0.0",
     "dist": {
-        "url": "https://github.com/petski/PHP-Validate/archive/fe31ee89d56f17ff8fae5a78b4fe4799091106c8.zip",
+        "url": "https://github.com/petski/PHP-Validate/archive/v1.0.0.zip",
         "type": "zip"
     },
     "autoload": {
