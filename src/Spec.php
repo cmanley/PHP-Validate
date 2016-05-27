@@ -5,13 +5,13 @@
 * Dependencies:
 * <pre>
 * exceptions.php
-* Validation.class.php
+* Validation.php
 * </pre>
 *
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.2 2016/02/21 02:08:48 cmanley Exp $
+* @version   $Id: Spec.php,v 1.2 2016/02/21 02:08:48 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -21,7 +21,7 @@ namespace Validate;
 * @ignore Require dependencies.
 */
 require_once(__DIR__ . '/exceptions.php');
-require_once(__DIR__ . '/Validation.class.php');
+require_once(__DIR__ . '/Validation.php');
 
 
 /**

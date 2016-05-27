@@ -1,8 +1,13 @@
 {
-    "name": "cmanley/php-validate",
+    "name": "petski/php-validate",
     "version": "1.0.0",
     "dist": {
-        "url": "https://github.com/cmanley/PHP-Validate/archive/5ffe04ae9eeba2dd5f9b3d70c00b6625e1a1c44a.zip",
+        "url": "https://github.com/petski/PHP-Validate/archive/v1.0.0.zip",
         "type": "zip"
+    },
+    "autoload": {
+        "psr-4": {
+            "Validate\\": "src/"
+        }
     }
 }

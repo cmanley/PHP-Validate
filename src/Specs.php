@@ -4,13 +4,13 @@
 *
 * Dependencies:
 * <pre>
-* Spec.class.php
+* Spec.php
 * </pre>
 *
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.class.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
+* @version   $Id: Specs.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
 * @package   cmanley
 */
 namespace Validate;
@@ -19,7 +19,7 @@ namespace Validate;
 /**
 * @ignore Require dependencies.
 */
-require_once(__DIR__ . '/Spec.class.php');
+require_once(__DIR__ . '/Spec.php');
 
 
 /**
