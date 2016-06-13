@@ -62,6 +62,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 				'mb_max_length'	=> 50,
 			)),
+			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
 		));
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
 		$this->assertEquals(false, $o->allow_empty, 'Read an attribute');

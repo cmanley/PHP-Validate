@@ -72,6 +72,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'mb_max_length'	=> 3,
 				'regex'			=> '/^\d{1,3}$/',
 				'types'			=> array('int', 'string'),
+				'_bla'			=> 'Options starting with an underscore should be silently ignored.',
 			),
 		));
 		$this->assertTrue(is_object($o), 'Create object with multiple Spec objects.');

@@ -61,6 +61,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'types'			=> array('string', 'int'),
 			'type'			=> 'scalar',
 			'nocase'		=> true,
+			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
 		));
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
 		$this->assertEquals(50, $o->max_length, 'Read an attribute');

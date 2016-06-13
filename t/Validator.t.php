@@ -62,6 +62,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'types' => array('float', 'integer'),
 				'max_value'	=> 10,
 				'min_value'	=> 0,
+				'_bla'		=> 'Options starting with an underscore should be silently ignored.',
 			),
 		);
 		$o = new $class(array(
