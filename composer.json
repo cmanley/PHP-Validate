@@ -5,7 +5,7 @@
         "type": "zip"
     },
     "require": {
-        "php": ">=5.3",
+        "php": ">=5.3"
     },
     "autoload": {
         "psr-4": {
