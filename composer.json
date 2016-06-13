@@ -4,9 +4,19 @@
         "url": "https://github.com/cmanley/PHP-Validate/archive/master.zip",
         "type": "zip"
     },
+    "require": {
+        "php": ">=5.3",
+    },
     "autoload": {
         "psr-4": {
             "Validate\\": "src/"
         }
-    }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Craig Manley",
+            "role": "Developer"
+        }
+    ]
 }
