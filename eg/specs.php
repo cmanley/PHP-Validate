@@ -5,10 +5,10 @@
 * Specs objects can be used as arrays since they implement the Countable, IteratorAggregate, and ArrayAccess interfaces.
 *
 * @author   Craig Manley
-* @version  $Id: specs.php,v 1.2 2016/02/17 23:04:58 cmanley Exp $
+* @version  $Id: specs.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
 * @package  Validate
 */
-require_once(__DIR__ . '/../src/Specs.class.php');
+require_once(__DIR__ . '/../src/Specs.php');
 
 
 // A Specs object can be created in 3 possible ways, all having the same effect.

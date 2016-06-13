@@ -9,7 +9,7 @@ if (isset($argv)) {
 class Test extends PHPUnit_Framework_TestCase {
 
 	const CLASS_NAME = 'Validate\\Validation';
-	const FILE_NAME = '../src/Validation.class.php';
+	const FILE_NAME = '../src/Validation.php';
 
     public function testRequire() {
     	$file = __DIR__ . '/' . static::FILE_NAME;

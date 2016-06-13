@@ -4,10 +4,10 @@
 * The 'after' function is executed after other spec validations have been performed.
 *
 * @author   Craig Manley
-* @version  $Id: validator_after.php,v 1.2 2016/02/17 23:04:58 cmanley Exp $
+* @version  $Id: validator_after.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
 * @package  Validate
 */
-require_once(__DIR__ . '/../src/Validator.class.php');
+require_once(__DIR__ . '/../src/Validator.php');
 
 
 # Define the validation specs

@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.4 2016/06/13 11:04:09 cmanley Exp $
+* @version   $Id: Validation.php,v 1.1 2016/06/13 20:04:09 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;

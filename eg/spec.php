@@ -6,10 +6,10 @@
 * The Spec class is rarely used stand-alone as it is only able to validate a single value.
 *
 * @author   Craig Manley
-* @version  $Id: spec.php,v 1.2 2016/02/17 23:04:58 cmanley Exp $
+* @version  $Id: spec.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
 * @package  Validate
 */
-require_once(__DIR__ . '/../src/Spec.class.php');
+require_once(__DIR__ . '/../src/Spec.php');
 
 // A Spec object can be created in 3 possible ways, all having the same effect.
 $specs = array();
