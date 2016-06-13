@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.class.php,v 1.2 2016/02/21 02:08:48 cmanley Exp $
+* @version   $Id: Spec.class.php,v 1.3 2016/06/13 10:42:02 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -141,6 +141,10 @@ class Spec {
 				// Process boolean options
 				elseif (in_array($key, array('allow_empty', 'optional'))) {
 					$this->$key = (boolean) $value;
+				}
+
+				elseif (substr($k,0,1) === '_') {
+					// Silently ignore options prefixed with underscore.
 				}
 
 				else {

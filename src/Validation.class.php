@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.class.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
+* @version   $Id: Validation.class.php,v 1.3 2016/06/13 10:42:02 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -202,6 +202,9 @@ class Validation {
 					$this->$key = (boolean) $value;
 				}
 
+				elseif (substr($k,0,1) === '_') {
+					// Silently ignore options prefixed with underscore.
+				}
 				else {
 					throw new \InvalidArgumentException("Unknown argument \"$key\".");
 				}
@@ -310,7 +313,7 @@ class Validation {
 				}
 			}
 			if ($this->regex) {
-				if (!(is_scalar($arg) && preg_match($this->regex, $arg))) {
+				if (!(is_scalar($arg) && preg_match($this->regex, is_bool($arg) ? intval($arg) : $arg))) {
 					$this->last_failure = 'regex';
 					return false;
 				}

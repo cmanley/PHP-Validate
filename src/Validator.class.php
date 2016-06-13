@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.class.php,v 1.2 2016/02/25 03:35:29 cmanley Exp $
+* @version   $Id: Validator.class.php,v 1.3 2016/06/13 10:42:02 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -140,6 +140,9 @@ class Validator {
 				// Process boolean options
 				elseif (in_array($k, array('allow_extra', 'empty_delete', 'empty_null', 'remove_extra'))) {
 					$this->$k = (boolean) $v;
+				}
+				elseif (substr($k,0,1) === '_') {
+					// Silently ignore options prefixed with underscore.
 				}
 				else {
 					throw new \InvalidArgumentException("Unhandled option '$k'");
