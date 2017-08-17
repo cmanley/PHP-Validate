@@ -46,7 +46,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'name'	=> array(
 				'type'			=> 'string',
 				'max_length'	=> 2,
-				'max_length'	=> 30,
+				'max_length'	=> 30,				
 			),
 			'birthdate' => array(
 				'type'	=> 'string',
@@ -83,6 +83,11 @@ class Test extends PHPUnit_Framework_TestCase {
 				'type'			=> 'string',
 				'max_length'	=> 2,
 				'max_length'	=> 30,
+				'after'	=> function(&$value) {
+					if (is_string($value)) {
+						$value = strtoupper($value);
+					}
+				},
 			),
 			'birthdate' => array(
 				'type'	=> 'string',
@@ -116,7 +121,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					'score'		=> 7,
 				),
 				'expect'	=> array(
-					'name'		=> 'Jane',
+					'name'		=> 'JANE',
 					'birthdate'	=> '1984-01-31',
 					'score'		=> 7,
 				),
@@ -129,7 +134,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					'score'		=> 9,
 				),
 				'expect'	=> array(
-					'name'		=> 'Curt',
+					'name'		=> 'CURT',
 					'birthdate'	=> '1983-03-22',
 					'score'		=> 9,
 				),

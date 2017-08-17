@@ -52,8 +52,8 @@ class Test extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_object($o), 'Create empty object.');
 		$o = new $class(array(
 			'allow_empty'	=> false,
-			'before'		=> function(&$x) { $x = mb_strtolower($x); },
-			'after'			=> function(&$x) { $x = mb_strtolower($x); },
+			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
+			'after'			=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'default'		=> 'nobody@home.com',
 			'description'	=> 'Email address',
 			'optional'		=> true,
@@ -71,7 +71,8 @@ class Test extends PHPUnit_Framework_TestCase {
 	public function testValidate() {
 		$spec = new Validate\Spec(array(
 			'allow_empty'	=> false,
-			'after'			=> function(&$x) { $x = mb_strtolower($x); },
+			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
+			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
 			'description'	=> 'Email address',
 			'validation'	=> new Validate\Validation(array(
 				'type'			=> 'string',
@@ -174,12 +175,20 @@ class Test extends PHPUnit_Framework_TestCase {
 			$input = 'anything';
 			$this->assertTrue($spec->validate($input), "Using callback '$when' with void return value validates as true.");
 			$this->assertEquals(null, $spec->getLastFailure(), 'Check last failure');
+
 			$spec = new Validate\Spec(array(
 				$when			=> function(&$x) { return false; },
 			));
 			$input = 'anything';
-			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as false.");
+			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as FALSE.");
 			$this->assertEquals("callback $when", $spec->getLastFailure(), 'Check last failure');
+
+			$spec = new Validate\Spec(array(
+				$when			=> function(&$x) { $x = strtoupper($x); return true; },
+			));
+			$input = 'anything';
+			$this->assertTrue($spec->validate($input), "Using callback '$when' with TRUE return value validates as TRUE.");
+			$this->assertEquals($input, 'ANYTHING', "'$when' callback modified variable passed by reference.");
 		}
 	}
 

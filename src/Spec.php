@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.1 2016/06/13 20:04:08 cmanley Exp $
+* @version   $Id: Spec.php,v 1.2 2017/08/17 23:42:08 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -302,7 +302,7 @@ class Spec {
 						return false;
 					}
 				}
-				if ($this->after) {
+				if ($this->after && !is_null($arg)) {	# Ignore the 'after' callback if the 'before' callback set the value to null.
 					$x = call_user_func_array($this->after, array(&$arg)); // possible return values are: false, null (void)
 					if ($x === false) {
 						$this->last_failure = 'callback after';
