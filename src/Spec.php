@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.4 2018/02/02 16:18:21 cmanley Exp $
+* @version   $Id: Spec.php,v 1.5 2018/02/02 16:27:02 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
