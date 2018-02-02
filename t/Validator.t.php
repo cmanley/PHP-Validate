@@ -147,7 +147,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					'score'		=> 'high',	// not allowed
 				),
 				'expect'	=> null,
-				'expect_exception'	=> "Parameter 'score' failed the validation check 'types' for value string 'high'",
+				'expect_exception'	=> 'Parameter "score" validation check "types" failed for string value "high"',
 			),
 		);
 		foreach ($tests as $i => $test) {
