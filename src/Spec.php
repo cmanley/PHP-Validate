@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.2 2017/08/17 23:42:08 cmanley Exp $
+* @version   $Id: Spec.php,v 1.4 2018/02/02 16:18:21 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -91,7 +91,7 @@ class Spec {
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check
+	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.
 	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
 	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
 	*	default		: Any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
@@ -294,6 +294,12 @@ class Spec {
 					if ($x === false) {
 						$this->last_failure = 'callback before';
 						return false;
+					}
+					if (is_null($arg)) {
+						if (!$this->optional) {
+							$this->last_failure = 'mandatory (set to null by callback)';
+							return false;
+						}
 					}
 				}
 				if ($this->validation) {
