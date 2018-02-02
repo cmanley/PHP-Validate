@@ -5,7 +5,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.1 2016/02/17 23:04:59 cmanley Exp $
+* @version   $Id: exceptions.php,v 1.4 2018/02/02 16:22:52 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -42,7 +42,10 @@ class ValidationCheckException extends ValidationException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = "The validation check '$check' failed for value " . $this->getValueSimple();
+			$message = 'The validation check "' . $check . '" failed for ' . gettype($this->value) . ' value';
+			if (is_scalar($value)) {
+				$message .= ' ' . $this->getStringPlaceholderValue();
+			}
 		}
 		parent::__construct($message);
 	}
@@ -54,6 +57,27 @@ class ValidationCheckException extends ValidationException {
 	*/
 	public function getCheck() {
 		return $this->check;
+	}
+
+	/**
+	* Return a string representation of the scalar value that caused the failure, for use in error messages.
+	* If the value was not a scalar, then null is returned.
+	*
+	* @return string|null
+	*/
+	public function getStringPlaceholderValue() {
+		if (is_scalar($this->value)) {
+			if (is_bool($this->value)) {
+				return $this->value ? 'true' : 'false';
+			}
+			elseif (is_string($this->value)) {
+				return '"' . $this->value . '"';
+			}
+			else {
+				return (string)$this->value;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -107,7 +131,10 @@ class ValidationNamedCheckException extends ValidationCheckException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = "Parameter '$name' failed the validation check '$check' for value " . $this->getValueSimple();
+			$message = 'Parameter "' . $name . '" validation check "' . $check . '" failed for ' . gettype($this->value) . ' value';
+			if (is_scalar($value)) {
+				$message .= ' ' . $this->getStringPlaceholderValue();
+			}
 		}
 		parent::__construct($check, $value, $message);
 	}
