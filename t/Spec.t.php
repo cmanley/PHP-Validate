@@ -25,7 +25,7 @@ class Test extends PHPUnit_Framework_TestCase {
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
 		$methods = array(
-			// public
+			# public
 			'__construct',
 			'__get',
 
@@ -34,6 +34,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'before',
 			'after',
 			'optional',
+			'trim',
 			'validation',
 
 			'getDefault',
@@ -129,7 +130,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'allow_empty'	=> false,
 			'after'			=> function(&$x) { $x = mb_strtolower($x); },
 			'description'	=> 'Email address',
-			'default'		=> 'nobody',	// defaults aren't validated as they are trusted values
+			'default'		=> 'nobody',	# defaults aren't validated as they are trusted values
 			'validation'	=> new Validate\Validation(array(
 				'type'			=> 'string',
 				'callbacks'		=> array(
@@ -170,7 +171,7 @@ class Test extends PHPUnit_Framework_TestCase {
 	public function testReturnValuesBeforeAfter() {
 		foreach (array('before', 'after') as $when) {
 			$spec = new Validate\Spec(array(
-				$when			=> function(&$x) {},	// void (null) result
+				$when			=> function(&$x) {},	# void (null) result
 			));
 			$input = 'anything';
 			$this->assertTrue($spec->validate($input), "Using callback '$when' with void return value validates as true.");

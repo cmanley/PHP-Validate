@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.5 2018/02/02 16:27:02 cmanley Exp $
+* @version   $Id: Spec.php,v 1.6 2018/03/12 23:21:41 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -31,7 +31,7 @@ require_once(__DIR__ . '/Validation.php');
 *
 * SYNOPSIS:
 *
-*	// Typical creation:
+*	# Typical creation:
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
 *		'description'	=> 'Just an optional description',
@@ -44,7 +44,7 @@ require_once(__DIR__ . '/Validation.php');
 *		))),
 *	));
 *
-*	// Lazy creation:
+*	# Lazy creation:
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
 *		'description'	=> 'Just an optional description',
@@ -57,7 +57,7 @@ require_once(__DIR__ . '/Validation.php');
 *		),
 *	));
 *
-*	// Very lazy creation (Validation options instead of a "validation" key):
+*	# Very lazy creation (Validation options instead of a "validation" key):
 *	$spec = new Validate\Spec(array(
 *		'optional'		=> true,
 *		'description'	=> 'Just an optional description',
@@ -68,7 +68,7 @@ require_once(__DIR__ . '/Validation.php');
 *		),
 *	));
 *
-*	// And finally validating something:
+*	# And finally validating something:
 *	print (int) $spec->validate("hay") . "\n";
 *
 * @package	cmanley
@@ -81,21 +81,24 @@ class Spec {
 	protected $before;
 	protected $after;
 	protected $optional = false;
-	protected $validation; // Validation object or null
+	protected $trim = false;
+	protected $validation; # Validation object or null
 
-	// other:
+	# other:
 	protected $last_failure;
+	protected $use_preg_utf8_flag;	# for preg trimming
 
 	/**
 	* Constructor.
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.
+	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.	
 	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
 	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
 	*	default		: Any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
 	*	optional	: boolean, if true, then null values are allowed
+	*	trim		: boolean, if true, then whitespace is trimmed off both ends of string values before validation.
 	*	description	: Optional description that can be used by user code.
 	*	validation	: Validation object
 	* </pre>
@@ -104,7 +107,7 @@ class Spec {
 	*
 	* @param array $args associative array of options
 	*/
-	public function __construct(array $args = null) {
+	public function __construct(array $args = null) {		
 		if ($args) {
 			$unknown_args = array();
 			foreach ($args as $key => $value) {
@@ -138,13 +141,13 @@ class Spec {
 						$this->$key = $value;
 					}
 				}
-				// Process boolean options
-				elseif (in_array($key, array('allow_empty', 'optional'))) {
+				# Process boolean options
+				elseif (in_array($key, array('allow_empty', 'optional', 'trim'))) {
 					$this->$key = (boolean) $value;
 				}
 
 				elseif (substr($key,0,1) === '_') {
-					// Silently ignore options prefixed with underscore.
+					# Silently ignore options prefixed with underscore.
 				}
 
 				else {
@@ -161,6 +164,7 @@ class Spec {
 				}
 			}
 		}
+		$this->use_preg_utf8_flag = $this->trim && (mb_strtoupper(mb_internal_encoding()) == 'UTF-8');
 	}
 
 
@@ -169,17 +173,17 @@ class Spec {
 	* All options passed into the constructor can be read using property accessors, e.g. print $spec->optional . "\n";
 	*/
 	public function __get($key) {
-		// TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
+		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
 			$p = $r->getProperty($key);
 		}
 		catch (\ReflectionException $e) {
-			// snuff unknown properties with exception message 'Property x does not exist'
+			# snuff unknown properties with exception message 'Property x does not exist'
 		}
 		if ($p && ($p->isProtected() || $p->isPublic()) && !$p->isStatic()) {
-			$p->setAccessible(true); // Allow access to non-public members.
+			$p->setAccessible(true); # Allow access to non-public members.
 			return $p->getValue($this);
 		}
 		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
@@ -247,6 +251,16 @@ class Spec {
 
 
 	/**
+	* Returns the value of the 'trim' option as passed into the constructor.
+	*
+	* @return boolean
+	*/
+	public function trim() {
+		return $this->trim;
+	}
+
+
+	/**
 	* Return the value of the 'validation' option as passed into or created by the constructor.
 	*
 	* @return Validation|null
@@ -275,8 +289,18 @@ class Spec {
 	* @return boolean
 	*/
 	public function validate(&$arg) {
-		if (is_string($arg) && !strlen($arg) && !$this->allow_empty) {
-			$arg = null;
+		if (is_string($arg)) {
+			if ($this->trim) {
+				if ($this->use_preg_utf8_flag) {
+					$arg = preg_replace('/^\s+|\s+$/u', '', $arg);
+				}
+				else {
+					$arg = trim($arg);
+				}
+			}
+			if (!strlen($arg) && !$this->allow_empty) {
+				$arg = null;
+			}
 		}
 		if (is_null($arg) && !is_null($this->default)) {
 			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
@@ -290,10 +314,23 @@ class Spec {
 			}
 			else {
 				if ($this->before) {
-					$x = call_user_func_array($this->before, array(&$arg)); // possible return values are: false, null (void)
+					$x = call_user_func_array($this->before, array(&$arg)); # possible return values are: false, null (void)
 					if ($x === false) {
 						$this->last_failure = 'callback before';
 						return false;
+					}
+					if (is_string($arg)) {
+						if ($this->trim) {
+							if ($this->use_preg_utf8_flag) {
+								$arg = preg_replace('/^\s+|\s+$/u', '', $arg);
+							}
+							else {
+								$arg = trim($arg);
+							}
+						}
+						if (!strlen($arg) && !$this->allow_empty) {
+							$arg = null;
+						}
 					}
 					if (is_null($arg)) {
 						if (!$this->optional) {
@@ -309,11 +346,12 @@ class Spec {
 					}
 				}
 				if ($this->after && !is_null($arg)) {	# Ignore the 'after' callback if the 'before' callback set the value to null.
-					$x = call_user_func_array($this->after, array(&$arg)); // possible return values are: false, null (void)
+					$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
 					if ($x === false) {
 						$this->last_failure = 'callback after';
 						return false;
 					}
+					# Assume callback 'knows' what it wants in terms of trimming, empty strings, etc.
 				}
 			}
 		}
