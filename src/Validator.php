@@ -9,7 +9,7 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright Â© 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 * @version   $Id: Validator.php,v 1.2 2018/05/26 22:32:33 cmanley Exp $
 * @package   Validate
@@ -265,7 +265,7 @@ class Validator {
 	public function validate_pos(array $args) {
 		$specs = $this->specs();
 		if ($specs) {
-			$specs = new Specs(array_values($specs->toArray())); // make sure that specs is a sequential numerically indexed array.
+			$specs = array_values($this->specs()->toArray()); // make sure that specs is a sequential numerically indexed array.
 		}
 		$args = array_values($args); // this make sure that args is a sequential numerically indexed array.
 		foreach ($args as $k => &$v) {
