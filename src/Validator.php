@@ -263,7 +263,7 @@ class Validator {
 	* @throws ValidationException
 	*/
 	public function validate_pos(array $args) {
-        $specs = $this->specs();
+		$specs = $this->specs();
 		if ($specs) {
 			$specs = new Specs(array_values($specs->toArray())); // make sure that specs is a sequential numerically indexed array.
 		}
