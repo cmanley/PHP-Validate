@@ -9,9 +9,9 @@
 * </pre>
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright Â© 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.6 2018/03/12 23:21:41 cmanley Exp $
+* @version   $Id: Spec.php,v 1.7 2018/05/26 22:51:21 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -93,7 +93,7 @@ class Spec {
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.	
+	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.
 	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
 	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
 	*	default		: Any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
@@ -107,7 +107,7 @@ class Spec {
 	*
 	* @param array $args associative array of options
 	*/
-	public function __construct(array $args = null) {		
+	public function __construct(array $args = null) {
 		if ($args) {
 			$unknown_args = array();
 			foreach ($args as $key => $value) {
