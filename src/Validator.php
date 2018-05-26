@@ -69,7 +69,7 @@ require_once(__DIR__ . '/Specs.php');
 *
 *	# Using positional parameters:
 *	function my_str_replace() {
-*		my $args = (new Validate\Validator(array(
+*		$args = (new Validate\Validator(array(
 *			'specs' => array(
 *				array(
 *					'type' => 'scalar',
@@ -81,7 +81,7 @@ require_once(__DIR__ . '/Specs.php');
 *	 				'type' => 'scalar',
 *				),
 *			),
-*		))->validate_pos(func_get_args());
+*		)))->validate_pos(func_get_args());
 *		$search		= $args[0];
 *		$replace	= $args[1];
 *		$subject	= $args[2];
@@ -263,9 +263,9 @@ class Validator {
 	* @throws ValidationException
 	*/
 	public function validate_pos(array $args) {
-		$specs = $this->specs();
+        $specs = $this->specs();
 		if ($specs) {
-			$specs = array_values($this->specs()->toArray()); // make sure that specs is a sequential numerically indexed array.
+			$specs = new Specs(array_values($specs->toArray())); // make sure that specs is a sequential numerically indexed array.
 		}
 		$args = array_values($args); // this make sure that args is a sequential numerically indexed array.
 		foreach ($args as $k => &$v) {

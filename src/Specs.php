@@ -78,7 +78,7 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* @throws InvalidArgumentException
 	*/
 	private static function _checkKeyValuePair($key, &$value) {
-		if (!(is_string($key) && strlen($key))) {
+		if (!(is_scalar($key) && strlen($key))) {
 			throw new \InvalidArgumentException('Only scalar string keys are allowed');
 		}
 		if (!(is_null($value) || ($value instanceof Spec))) {
