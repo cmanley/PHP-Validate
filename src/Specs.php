@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.php,v 1.1 2016/06/13 20:04:09 cmanley Exp $
+* @version   $Id: Specs.php,v 1.2 2018/05/26 22:32:33 cmanley Exp $
 * @package   cmanley
 */
 namespace Validate;
@@ -73,13 +73,13 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Checks the given key value pair.
 	*
-	* @param string $key
+	* @param string|int $key
 	* @param mixed &$value
 	* @throws InvalidArgumentException
 	*/
 	private static function _checkKeyValuePair($key, &$value) {
-		if (!(is_string($key) && strlen($key))) {
-			throw new \InvalidArgumentException('Only scalar string keys are allowed');
+		if (!((is_string($key) && strlen($key)) || is_int($key))) {
+			throw new \InvalidArgumentException('Only string or int keys are allowed');
 		}
 		if (!(is_null($value) || ($value instanceof Spec))) {
 			if (is_array($value)) {

@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.php,v 1.1 2016/06/13 20:04:09 cmanley Exp $
+* @version   $Id: Validator.php,v 1.2 2018/05/26 22:32:33 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -69,7 +69,7 @@ require_once(__DIR__ . '/Specs.php');
 *
 *	# Using positional parameters:
 *	function my_str_replace() {
-*		my $args = (new Validate\Validator(array(
+*		$args = (new Validate\Validator(array(
 *			'specs' => array(
 *				array(
 *					'type' => 'scalar',
@@ -81,7 +81,7 @@ require_once(__DIR__ . '/Specs.php');
 *	 				'type' => 'scalar',
 *				),
 *			),
-*		))->validate_pos(func_get_args());
+*		)))->validate_pos(func_get_args());
 *		$search		= $args[0];
 *		$replace	= $args[1];
 *		$subject	= $args[2];
@@ -272,7 +272,7 @@ class Validator {
 			if ($this->empty_null && is_string($v) && !strlen($v)) {
 				$v = null;
 			}
-			$spec = $specs && $specs->offsetExists($k) ? $specs[$k] : null;
+			$spec = $specs && (is_array($specs) ? array_key_exists($k, $specs) : $specs->offsetExists($k)) ? $specs[$k] : null;	// array_key_exists does not work with ArrayAccess objects yet. Perhaps in the future it will.
 			if (!$spec) {
 				// note: remove_extra doesn't apply to positional arrays
 				if (!$this->allow_extra) {

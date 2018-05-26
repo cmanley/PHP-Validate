@@ -46,7 +46,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'name'	=> array(
 				'type'			=> 'string',
 				'max_length'	=> 2,
-				'max_length'	=> 30,				
+				'max_length'	=> 30,
 			),
 			'birthdate' => array(
 				'type'	=> 'string',
@@ -158,6 +158,106 @@ class Test extends PHPUnit_Framework_TestCase {
 			$validated_input = null;
 			try {
 				$validated_input = $validator->validate($input);
+			}
+			catch (Validate\ValidationException $e) {
+				$got_exception = $e->getMessage();
+			}
+			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
+			$this->assertEquals($expect_exception, $got_exception, "Test $i throws the expected exception.");
+		}
+	}
+
+	public function testValidatePosNamedSpecs() {
+		$specs = array(
+			'name'	=> array(
+				'type'			=> 'string',
+				'max_length'	=> 2,
+				'max_length'	=> 30,
+				'after'	=> function(&$value) {
+					if (is_string($value)) {
+						$value = strtoupper($value);
+					}
+				},
+			),
+			'score' => array(
+				'types' => array('float', 'integer'),
+				'max_value'	=> 10,
+				'min_value'	=> 0,
+			),
+		);
+		$validator = new Validate\Validator(array(
+			'specs'	=> $specs,
+		));
+		$tests = array(
+			array(
+				'input'		=> array('Jane', 7),
+				'expect'	=> array('JANE', 7),
+				'expect_exception'	=> null,
+			),
+			array(
+				'input'		=> array('Mike', 'high'),
+				'expect'	=> null,
+				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+			),
+		);
+		foreach ($tests as $i => $test) {
+			$input	= $test['input'];
+			$expect	= $test['expect'];
+			$expect_exception	= $test['expect_exception'];
+			$got_exception = null;
+			$validated_input = null;
+			try {
+				$validated_input = $validator->validate_pos($input);
+			}
+			catch (Validate\ValidationException $e) {
+				$got_exception = $e->getMessage();
+			}
+			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
+			$this->assertEquals($expect_exception, $got_exception, "Test $i throws the expected exception.");
+		}
+	}
+
+	public function testValidatePosUnnamedSpecs() {
+		$specs = array(
+			array(
+				'type'			=> 'string',
+				'max_length'	=> 2,
+				'max_length'	=> 30,
+				'after'	=> function(&$value) {
+					if (is_string($value)) {
+						$value = strtoupper($value);
+					}
+				},
+			),
+			array(
+				'types' => array('float', 'integer'),
+				'max_value'	=> 10,
+				'min_value'	=> 0,
+			),
+		);
+		$validator = new Validate\Validator(array(
+			'specs'	=> $specs,
+		));
+		$tests = array(
+			array(
+				'input'		=> array('Jane', 7),
+				'expect'	=> array('JANE', 7),
+				'expect_exception'	=> null,
+			),
+			array(
+				'input'		=> array('Mike', 'high'),
+				'expect'	=> null,
+				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+			),
+		);
+		foreach ($tests as $i => $test) {
+			$input	= $test['input'];
+			$expect	= $test['expect'];
+			$expect_exception	= $test['expect_exception'];
+			$got_exception = null;
+			$validated_input = null;
+			try {
+				$validated_input = $validator->validate_pos($input);
 			}
 			catch (Validate\ValidationException $e) {
 				$got_exception = $e->getMessage();
