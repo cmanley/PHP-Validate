@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.php,v 1.2 2018/05/26 22:51:21 cmanley Exp $
+* @version   $Id: Validation.php,v 1.3 2018/05/26 22:55:49 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -31,9 +31,9 @@ require_once(__DIR__ . '/exceptions.php');
 */
 class Validation {
 
-	// validations:
-	protected $allowed_values;  // array of scalars
-	protected $callbacks; // associative array of key => callback pairs
+	# validations:
+	protected $allowed_values;  # array of scalars
+	protected $callbacks; # associative array of key => callback pairs
 	protected $callback;
 	protected $isa;
 	protected $mb_max_length;
@@ -46,10 +46,10 @@ class Validation {
 	protected $resource_type;
 	protected $types;
 
-	// options:
+	# options:
 	protected $nocase;
 
-	// other:
+	# other:
 	protected $last_failure;
 
 	/**
@@ -85,7 +85,7 @@ class Validation {
 	public function __construct(array $args = null) {
 		if ($args) {
 			foreach ($args as $key => $value) {
-				// Process validations:
+				# Process validations:
 				if ($key == 'allowed_values') {
 					if (!(is_array($value) && count($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be an array containing at least 1 value.");
@@ -154,7 +154,7 @@ class Validation {
 					elseif ($value == 'float') {
 						$value = 'double';
 					}
-					if (is_array($this->types)) { // because 'types' was given
+					if (is_array($this->types)) { # because 'types' was given
 						$this->types []= $value;
 					}
 					else {
@@ -171,8 +171,8 @@ class Validation {
 						}
 						/*
 						'boolean',
-						'integer', // Be careful with integers > 2147483647 (0x7FFFFFFF) or < -2147483648 (0x8000000) as these automatically become floats in PHP.
-						'double', // (for historical reasons "double" is returned in case of a float, and not simply "float")
+						'integer', # Be careful with integers > 2147483647 (0x7FFFFFFF) or < -2147483648 (0x8000000) as these automatically become floats in PHP.
+						'double', # (for historical reasons "double" is returned in case of a float, and not simply "float")
 						'string',
 						'array',
 						'object',
@@ -180,7 +180,7 @@ class Validation {
 						'NULL',
 						'unknown type',
 						*/
-						// Handle some common type aliases too:
+						# Handle some common type aliases too:
 						if ($type == 'int') {
 							$type = 'integer';
 						}
@@ -189,7 +189,7 @@ class Validation {
 						}
 						unset($type);
 					}
-					if (is_array($this->$key)) { // because 'type' was given
+					if (is_array($this->$key)) { # because 'type' was given
 						$this->$key = array_merge($this->$key, $value);
 					}
 					else {
@@ -197,13 +197,13 @@ class Validation {
 					}
 				}
 
-				// Process boolean options
+				# Process boolean options
 				elseif (in_array($key, array('nocase'))) {
 					$this->$key = (boolean) $value;
 				}
 
 				elseif (substr($key,0,1) === '_') {
-					// Silently ignore options prefixed with underscore.
+					# Silently ignore options prefixed with underscore.
 				}
 				else {
 					throw new \InvalidArgumentException("Unknown argument \"$key\".");
@@ -218,18 +218,18 @@ class Validation {
 	* All options passed into the constructor can be read using property accessors, e.g. print $validation->regex . "\n";
 	*/
 	public function __get($key) {
-		// TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
+		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
 			$p = $r->getProperty($key);
 		}
 		catch (\ReflectionException $e) {
-			// snuff unknown properties with exception message 'Property x does not exist'
+			# snuff unknown properties with exception message 'Property x does not exist'
 		}
 		if ($p && ($p->isProtected() || $p->isPublic()) && !$p->isStatic()) {
-			$p->setAccessible(true); // Allow access to non-public members.
-			return $p->getValue($this); // This design breaks mirrors. Surely the reflection property should know what object was given to ReflectionObject.
+			$p->setAccessible(true); # Allow access to non-public members.
+			return $p->getValue($this); # This design breaks mirrors. Surely the reflection property should know what object was given to ReflectionObject.
 		}
 		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
 	}

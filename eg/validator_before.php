@@ -4,7 +4,7 @@
 * The 'before' function is executed before other spec validations have been performed.
 *
 * @author   Craig Manley
-* @version  $Id: validator_before.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
+* @version  $Id: validator_before.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
 * @package  Validate
 */
 require_once(__DIR__ . '/../src/Validator.php');
@@ -19,8 +19,8 @@ $specs = array(
 	),
 	'birthdate' => array(
 		'type'	=> 'string',
-		'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', // should be yyyy-mm-dd
-		'before'	=> function(&$value) { // expect dd/mm/yyyy
+		'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
+		'before'	=> function(&$value) { # expect dd/mm/yyyy
 			if (is_string($value) && preg_match('#^([0-3]\d)/([01]\d)/(\d{4})$#', $value, $matches)) {
 				$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
 			}

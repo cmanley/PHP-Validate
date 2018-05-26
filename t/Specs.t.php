@@ -25,18 +25,18 @@ class Test extends PHPUnit_Framework_TestCase {
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
 		$methods = array(
-			// public
+			# public
 			'__construct',
 			'toArray',
 			'keys',
 
-			// for Countable interface
+			# for Countable interface
 			'count',
 
-			// for IteratorAggregate interface
+			# for IteratorAggregate interface
 			'getIterator',
 
-			// for ArrayAccess interface
+			# for ArrayAccess interface
 			'offsetSet',
 			'offsetExists',
 			'offsetUnset',
@@ -49,7 +49,7 @@ class Test extends PHPUnit_Framework_TestCase {
 
 	public function testInterfaces() {
 		$class = static::CLASS_NAME;
-		$expect = array('ArrayAccess', 'Countable', 'IteratorAggregate', 'Traversable'); // Traversable is part of IteratorAggregate
+		$expect = array('ArrayAccess', 'Countable', 'IteratorAggregate', 'Traversable'); # Traversable is part of IteratorAggregate
 		$got = class_implements($class, false);
 		sort($got);
 		$this->assertEquals($expect, $got, "$class implements the interfaces " . join(', ', $expect));
@@ -66,7 +66,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'regex'			=> '/^[A-Z][a-z]+$/',
 				'type'			=> 'string',
 			),
-			'surname'	=> 1,	// shortcut for Spec with 'optional' => !value
+			'surname'	=> 1,	# shortcut for Spec with 'optional' => !value
 			'age'		=> array(
 				'optional'		=> true,
 				'mb_max_length'	=> 3,
@@ -138,7 +138,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'regex'			=> '/^[A-Z][a-z]+$/',
 				'type'			=> 'string',
 			),
-			'surname'	=> 1,	// shortcut for Spec with 'optional' => !value
+			'surname'	=> 1,	# shortcut for Spec with 'optional' => !value
 			'age'		=> array(
 				'optional'		=> true,
 				'mb_max_length'	=> 3,

@@ -25,7 +25,7 @@ class Test extends PHPUnit_Framework_TestCase {
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
 		$methods = array(
-			// public
+			# public
 			'__construct',
 			'__get',
 			'specs',
@@ -50,8 +50,8 @@ class Test extends PHPUnit_Framework_TestCase {
 			),
 			'birthdate' => array(
 				'type'	=> 'string',
-				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', // should be yyyy-mm-dd
-				'before'	=> function(&$value) { // expect dd/mm/yyyy
+				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
+				'before'	=> function(&$value) { # expect dd/mm/yyyy
 					if (is_string($value) && preg_match('#^([0-3]\d)/([01]\d)/(\d{4})$#', $value, $matches)) {
 						$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
 					}
@@ -69,7 +69,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'allow_extra'	=> false,
 			'empty_delete'	=> false,
 			'empty_null'	=> true,
-			//'prefix'
+			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
 		));
@@ -91,8 +91,8 @@ class Test extends PHPUnit_Framework_TestCase {
 			),
 			'birthdate' => array(
 				'type'	=> 'string',
-				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', // should be yyyy-mm-dd
-				'before'	=> function(&$value) { // expect dd/mm/yyyy
+				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
+				'before'	=> function(&$value) { # expect dd/mm/yyyy
 					if (is_string($value) && preg_match('#^([0-3]\d)/([01]\d)/(\d{4})$#', $value, $matches)) {
 						$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
 					}
@@ -109,7 +109,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'allow_extra'	=> false,
 			'empty_delete'	=> false,
 			'empty_null'	=> true,
-			//'prefix'
+			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
 		));
@@ -144,7 +144,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'input'		=> array(
 					'name'		=> 'Mike',
 					'birthdate'	=> '01/01/2000',
-					'score'		=> 'high',	// not allowed
+					'score'		=> 'high',	# not allowed
 				),
 				'expect'	=> null,
 				'expect_exception'	=> 'Parameter "score" validation check "types" failed for string value "high"',

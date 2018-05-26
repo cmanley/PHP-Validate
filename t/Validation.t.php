@@ -25,7 +25,7 @@ class Test extends PHPUnit_Framework_TestCase {
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
 		$methods = array(
-			// public
+			# public
 			'__construct',
 			'__get',
 			'getLastFailure',
@@ -42,11 +42,11 @@ class Test extends PHPUnit_Framework_TestCase {
 		$o = new $class();
 		$this->assertTrue(is_object($o), 'Create empty object.');
 		$o = new $class(array(
-			// Some of these validations contradict each other, but it's merely a test
+			# Some of these validations contradict each other, but it's merely a test
 			'allowed_values'	=> array('one@two.com', 'two@three.com'),
-			'callbacks'			=> array(	 // associative array of key => callback pairs
+			'callbacks'			=> array(	 # associative array of key => callback pairs
 				'syntax'	=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
-				'mx'		=> function($x) { return true; },	// dummy check
+				'mx'		=> function($x) { return true; },	# dummy check
 			),
 			'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 			'isa'			=> 'StdClass',

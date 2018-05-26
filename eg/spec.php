@@ -6,16 +6,16 @@
 * The Spec class is rarely used stand-alone as it is only able to validate a single value.
 *
 * @author   Craig Manley
-* @version  $Id: spec.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
+* @version  $Id: spec.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
 * @package  Validate
 */
 require_once(__DIR__ . '/../src/Spec.php');
 
-// A Spec object can be created in 3 possible ways, all having the same effect.
+# A Spec object can be created in 3 possible ways, all having the same effect.
 $specs = array();
 
 
-// This is the proper way to create a Spec object with it's embedded Validation object.
+# This is the proper way to create a Spec object with it's embedded Validation object.
 $specs []= new Validate\Spec(array(
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
@@ -30,7 +30,7 @@ $specs []= new Validate\Spec(array(
 ));
 
 
-// This is the lazy way to create a Spec object. It'll automatically convert the 'validation' array into a Validation object internally.
+# This is the lazy way to create a Spec object. It'll automatically convert the 'validation' array into a Validation object internally.
 $specs []= new Validate\Spec(array(
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
@@ -45,14 +45,14 @@ $specs []= new Validate\Spec(array(
 ));
 
 
-// This is the very lazy way to create a Spec object. It'll automatically create a Validation object internally.
+# This is the very lazy way to create a Spec object. It'll automatically create a Validation object internally.
 $specs []= new Validate\Spec(array(
-	// Spec options:
+	# Spec options:
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
 	'optional'		=> false,
 
-	// Validation options:
+	# Validation options:
 	'mb_max_length'	=> 10,
 	'regex'			=> '/a/',
 	'callbacks'		=> array(
@@ -61,7 +61,7 @@ $specs []= new Validate\Spec(array(
 ));
 
 
-// Check if all the Spec objects are indeed identical:
+# Check if all the Spec objects are indeed identical:
 if (count(array_unique(array_map(function($spec) { return var_export($spec,true); }, $specs))) != 1) {
 	die("The Spec objects are not identical!\n");
 }

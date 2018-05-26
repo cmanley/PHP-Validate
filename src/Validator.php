@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.php,v 1.3 2018/05/26 22:51:21 cmanley Exp $
+* @version   $Id: Validator.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -42,8 +42,8 @@ require_once(__DIR__ . '/Specs.php');
 *			),
 *			'birthdate' => array(
 *				'type'	=> 'string',
-*				'regex'	=> '#^[0-3]\d/[01]\d/\d{4}$#', // expect dd/mm/yyyy
-*				'after'	=> function(&$value) { // want yyyy-mm-dd
+*				'regex'	=> '#^[0-3]\d/[01]\d/\d{4}$#', # expect dd/mm/yyyy
+*				'after'	=> function(&$value) { # want yyyy-mm-dd
 *					if (is_string($value) && preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $value, $matches)) {
 *						$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
 *					}
@@ -94,7 +94,7 @@ require_once(__DIR__ . '/Specs.php');
 class Validator {
 
 	protected $allow_extra	= null;
-	protected $empty_delete	= true;	// odd one out - normally defaults are false
+	protected $empty_delete	= true;	# odd one out - normally defaults are false
 	protected $empty_null	= null;
 	protected $prefix		= '';
 	protected $remove_extra	= false;
@@ -137,12 +137,12 @@ class Validator {
 					}
 					$this->$k = $v;
 				}
-				// Process boolean options
+				# Process boolean options
 				elseif (in_array($k, array('allow_extra', 'empty_delete', 'empty_null', 'remove_extra'))) {
 					$this->$k = (boolean) $v;
 				}
 				elseif (substr($key,0,1) === '_') {
-					// Silently ignore options prefixed with underscore.
+					# Silently ignore options prefixed with underscore.
 				}
 				else {
 					throw new \InvalidArgumentException("Unhandled option '$k'");
@@ -157,17 +157,17 @@ class Validator {
 	* All options passed into the constructor can be read using property accessors, e.g. print $spec->optional . "\n";
 	*/
 	public function __get($key) {
-		// TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
+		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
 			$p = $r->getProperty($key);
 		}
 		catch (\ReflectionException $e) {
-			// snuff unknown properties with exception message 'Property x does not exist'
+			# snuff unknown properties with exception message 'Property x does not exist'
 		}
 		if ($p && ($p->isProtected() || $p->isPublic()) && !$p->isStatic()) {
-			$p->setAccessible(true); // Allow access to non-public members.
+			$p->setAccessible(true); # Allow access to non-public members.
 			return $p->getValue($this);
 		}
 		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
@@ -193,11 +193,11 @@ class Validator {
 	* @throws ValidationNamedCheckException
 	*/
 	public function validate(array $args) {
-		// Make sure keys in $args exist that have default values
+		# Make sure keys in $args exist that have default values
 		$specs = $this->specs();
 		if ($specs) {
 			foreach ($specs as $k => $spec) {
-				//if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+				#if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
 				if (!array_key_exists($k, $args)) {
 					$args[$k] = null;
 				}
@@ -206,7 +206,7 @@ class Validator {
 		if ($this->empty_delete) {
 			foreach ($args as $k => $v) {
 				if (is_null($v) || (is_string($v) && !strlen($v))) {
-					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { // don't delete arguments that have default values
+					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { # don't delete arguments that have default values
 						unset($args[$k]);
 					}
 				}
@@ -221,15 +221,15 @@ class Validator {
 			}
 		}
 
-		// If no spec exists, then return unvalidated arguments.
+		# If no spec exists, then return unvalidated arguments.
 		if (!$specs) {
 			return $args;
 		}
 
-		// Validate args
+		# Validate args
 		foreach ($args as $k => &$v) {
 			if ($specs->offsetExists($k)) {
-				// nop
+				# nop
 			}
 			elseif ($this->remove_extra) {
 				unset($args[$k]);
@@ -244,12 +244,12 @@ class Validator {
 			if (array_key_exists($k, $args)) {
 				$v =& $args[$k];
 			}
-			if (!$spec->validate($v)) { // also applies defaults or before/after mutators to $v reference
+			if (!$spec->validate($v)) { # also applies defaults or before/after mutators to $v reference
 				throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
 			}
 			unset($v);
 		}
-		return $args; // same as input if no befores were applied
+		return $args; # same as input if no befores were applied
 	}
 
 
@@ -265,22 +265,22 @@ class Validator {
 	public function validate_pos(array $args) {
 		$specs = $this->specs();
 		if ($specs) {
-			$specs = array_values($this->specs()->toArray()); // make sure that specs is a sequential numerically indexed array.
+			$specs = array_values($this->specs()->toArray()); # make sure that specs is a sequential numerically indexed array.
 		}
-		$args = array_values($args); // this make sure that args is a sequential numerically indexed array.
+		$args = array_values($args); # this make sure that args is a sequential numerically indexed array.
 		foreach ($args as $k => &$v) {
 			if ($this->empty_null && is_string($v) && !strlen($v)) {
 				$v = null;
 			}
-			$spec = $specs && (is_array($specs) ? array_key_exists($k, $specs) : $specs->offsetExists($k)) ? $specs[$k] : null;	// array_key_exists does not work with ArrayAccess objects yet. Perhaps in the future it will.
+			$spec = $specs && (is_array($specs) ? array_key_exists($k, $specs) : $specs->offsetExists($k)) ? $specs[$k] : null;	# array_key_exists does not work with ArrayAccess objects yet. Perhaps in the future it will.
 			if (!$spec) {
-				// note: remove_extra doesn't apply to positional arrays
+				# note: remove_extra doesn't apply to positional arrays
 				if (!$this->allow_extra) {
 					throw new ValidationException('Unexpected parameter at index ' . $this->prefix . $k);
 				}
 				continue;
 			}
-			if (!$spec->validate($v)) { // also applies before/after mutators to $v reference
+			if (!$spec->validate($v)) { # also applies before/after mutators to $v reference
 				throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
 			}
 			unset($v);

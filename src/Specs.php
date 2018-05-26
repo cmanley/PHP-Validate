@@ -10,7 +10,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.php,v 1.3 2018/05/26 22:51:21 cmanley Exp $
+* @version   $Id: Specs.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
 * @package   cmanley
 */
 namespace Validate;
@@ -29,7 +29,7 @@ require_once(__DIR__ . '/Spec.php');
 */
 class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 
-	private $pairs; // map of name => Spec pairs
+	private $pairs; # map of name => Spec pairs
 	static private $boolean_spec_true;
 	static private $boolean_spec_false;
 

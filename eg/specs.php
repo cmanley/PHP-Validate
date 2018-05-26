@@ -5,17 +5,17 @@
 * Specs objects can be used as arrays since they implement the Countable, IteratorAggregate, and ArrayAccess interfaces.
 *
 * @author   Craig Manley
-* @version  $Id: specs.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
+* @version  $Id: specs.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
 * @package  Validate
 */
 require_once(__DIR__ . '/../src/Specs.php');
 
 
-// A Specs object can be created in 3 possible ways, all having the same effect.
-// The contructor is given an associative array of name => Spec pairs
+# A Specs object can be created in 3 possible ways, all having the same effect.
+# The contructor is given an associative array of name => Spec pairs
 
 
-// This is the easy/lazy and my preferred way to create a Specs object with it's embedded Spec objects.
+# This is the easy/lazy and my preferred way to create a Specs object with it's embedded Spec objects.
 $specs_easy = new Validate\Specs(array(
 	'firstname'	=> array(
 		'description'	=> 'First name',
@@ -23,7 +23,7 @@ $specs_easy = new Validate\Specs(array(
 		'regex'			=> '/^[A-Z][a-z]+$/',
 		'type'			=> 'string',
 	),
-	'surname'	=> 1,	// shortcut for Spec with 'optional' => !value
+	'surname'	=> 1,	# shortcut for Spec with 'optional' => !value
 	'age'		=> array(
 		'optional'		=> true,
 		'mb_max_length'	=> 3,
@@ -33,7 +33,7 @@ $specs_easy = new Validate\Specs(array(
 ));
 
 
-// This is the less lazy way to create a Specs object with it's embedded Spec objects.
+# This is the less lazy way to create a Specs object with it's embedded Spec objects.
 $specs_lazy = new Validate\Specs(array(
 	'firstname'	=> (new Validate\Spec(array(
 		'description'	=> 'First name',
@@ -43,7 +43,7 @@ $specs_lazy = new Validate\Specs(array(
 			'types'			=> array('string'),
 		),
 	))),
-	'surname'	=> true,	// shortcut for Spec with 'optional' => !value
+	'surname'	=> true,	# shortcut for Spec with 'optional' => !value
 	'age'		=> (new Validate\Spec(array(
 		'optional'		=> true,
 		'validation'	=> array(
@@ -55,7 +55,7 @@ $specs_lazy = new Validate\Specs(array(
 ));
 
 
-// This is the proper and most verbose way to create a Specs object with it's embedded Spec objects.
+# This is the proper and most verbose way to create a Specs object with it's embedded Spec objects.
 $specs_proper = new Validate\Specs(array(
 	'firstname'	=> (new Validate\Spec(array(
 		'description'	=> 'First name',
@@ -82,7 +82,7 @@ $specs_proper = new Validate\Specs(array(
 
 
 
-// Check if all the Spec objects are indeed identical:
+# Check if all the Spec objects are indeed identical:
 if (count(array_unique(array_map(function($specs) { return var_export($specs,true); }, array($specs_easy, $specs_lazy, $specs_proper) ))) != 1) {
 	die("The Specs objects are not identical!\n");
 }
