@@ -199,6 +199,11 @@ class Test extends PHPUnit_Framework_TestCase {
 				'expect'	=> null,
 				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
 			),
+			array(
+				'input'		=> array(),
+				'expect'	=> null,
+				'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+			),
 		);
 		foreach ($tests as $i => $test) {
 			$input	= $test['input'];
@@ -248,6 +253,11 @@ class Test extends PHPUnit_Framework_TestCase {
 				'input'		=> array('Mike', 'high'),
 				'expect'	=> null,
 				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+			),
+			array(
+				'input'		=> array(),
+				'expect'	=> null,
+				'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
 			),
 		);
 		foreach ($tests as $i => $test) {
