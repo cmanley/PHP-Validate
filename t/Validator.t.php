@@ -167,57 +167,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function testValidatePosNamedSpecs() {
-		$specs = array(
-			'name'	=> array(
-				'type'			=> 'string',
-				'max_length'	=> 2,
-				'max_length'	=> 30,
-				'after'	=> function(&$value) {
-					if (is_string($value)) {
-						$value = strtoupper($value);
-					}
-				},
-			),
-			'score' => array(
-				'types' => array('float', 'integer'),
-				'max_value'	=> 10,
-				'min_value'	=> 0,
-			),
-		);
-		$validator = new Validate\Validator(array(
-			'specs'	=> $specs,
-		));
-		$tests = array(
-			array(
-				'input'		=> array('Jane', 7),
-				'expect'	=> array('JANE', 7),
-				'expect_exception'	=> null,
-			),
-			array(
-				'input'		=> array('Mike', 'high'),
-				'expect'	=> null,
-				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
-			),
-		);
-		foreach ($tests as $i => $test) {
-			$input	= $test['input'];
-			$expect	= $test['expect'];
-			$expect_exception	= $test['expect_exception'];
-			$got_exception = null;
-			$validated_input = null;
-			try {
-				$validated_input = $validator->validate_pos($input);
-			}
-			catch (Validate\ValidationException $e) {
-				$got_exception = $e->getMessage();
-			}
-			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
-			$this->assertEquals($expect_exception, $got_exception, "Test $i throws the expected exception.");
-		}
-	}
-
-	public function testValidatePosUnnamedSpecs() {
+	public function testValidatePosSpecs() {
 		$specs = array(
 			array(
 				'type'			=> 'string',
@@ -229,41 +179,174 @@ class Test extends PHPUnit_Framework_TestCase {
 					}
 				},
 			),
-			array(
+			'score' => array(	# string keys are allowed too.
 				'types' => array('float', 'integer'),
 				'max_value'	=> 10,
 				'min_value'	=> 0,
 			),
 		);
-		$validator = new Validate\Validator(array(
-			'specs'	=> $specs,
-		));
+		$inputs = array(
+			'normal'			=> array('Jane', 7),
+			'too few params'	=> array('Jane'),
+			'too many params'	=> array('Jane', 7, '', 'bla'),
+			'invalid 2nd param (index 1)' => array('Mike', 'high'),
+			'no params'			=> array(),
+		);
 		$tests = array(
-			array(
-				'input'		=> array('Jane', 7),
-				'expect'	=> array('JANE', 7),
-				'expect_exception'	=> null,
+			'no options' => array(
+				'options' => array(),
+				'expects' => array(
+					'normal'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'too few params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+					),
+					'too many params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Too many arguments given (4) for the number of specs (2)',
+					),
+					'invalid 2nd param (index 1)' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+					),
+					'no params' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+					),
+				),
 			),
-			array(
-				'input'		=> array('Mike', 'high'),
-				'expect'	=> null,
-				'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+			'allow_extra is true' => array(
+				'options' => array(
+					'allow_extra'	=> true,
+				),
+				'expects' => array(
+					'normal'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'too few params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+					),
+					'too many params'	=> array(
+						'expect'			=> array('JANE', 7, '', 'bla'),
+						'expect_exception'	=> null,
+					),
+					'invalid 2nd param (index 1)' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+					),
+					'no params' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+					),
+				),
+			),
+			'remove_extra is true' => array(
+				'options' => array(
+					'remove_extra'	=> true,
+				),
+				'expects' => array(
+					'normal'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'too few params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+					),
+					'too many params'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'invalid 2nd param (index 1)' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+					),
+					'no params' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+					),
+				),
+			),
+			'allow_extra is true and remove_extra is true' => array(
+				'options' => array(
+					'allow_extra'	=> true,
+					'remove_extra'	=> true,
+				),
+				'expects' => array(
+					'normal'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'too few params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+					),
+					'too many params'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'invalid 2nd param (index 1)' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+					),
+					'no params' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+					),
+				),
+			),
+			'allow_extra is true and empty_null is true' => array(
+				'options' => array(
+					'allow_extra'	=> true,
+					'empty_null'	=> true,
+				),
+				'expects' => array(
+					'normal'	=> array(
+						'expect'			=> array('JANE', 7),
+						'expect_exception'	=> null,
+					),
+					'too few params'	=> array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+					),
+					'too many params'	=> array(
+						'expect'			=> array('JANE', 7, null, 'bla'),
+						'expect_exception'	=> null,
+					),
+					'invalid 2nd param (index 1)' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+					),
+					'no params' => array(
+						'expect'			=> null,
+						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+					),
+				),
 			),
 		);
-		foreach ($tests as $i => $test) {
-			$input	= $test['input'];
-			$expect	= $test['expect'];
-			$expect_exception	= $test['expect_exception'];
-			$got_exception = null;
-			$validated_input = null;
-			try {
-				$validated_input = $validator->validate_pos($input);
+		foreach ($tests as $name => $test) {
+			$args = $test['options'];
+			$args['specs'] = $specs;
+			$validator = new Validate\Validator($args);
+			foreach ($inputs as $input_name => $input) {
+				$expect	= $test['expects'][$input_name]['expect'];
+				$expect_exception = $test['expects'][$input_name]['expect_exception'];
+				$got_exception = null;
+				$validated_input = null;
+				try {
+					$validated_input = $validator->validate_pos($input);
+				}
+				catch (Validate\ValidationException $e) {
+					$got_exception = $e->getMessage();
+				}
+				$this->assertEquals($expect, $validated_input, "Test \"$name\"->\"$input_name\" validate() returns expected result.");
+				$this->assertEquals($expect_exception, $got_exception, "Test \"$name\"->\"$input_name\" throws the expected exception.");
 			}
-			catch (Validate\ValidationException $e) {
-				$got_exception = $e->getMessage();
-			}
-			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
-			$this->assertEquals($expect_exception, $got_exception, "Test $i throws the expected exception.");
 		}
 	}
 

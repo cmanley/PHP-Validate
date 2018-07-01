@@ -11,7 +11,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
+* @version   $Id: Validator.php,v 1.5 2018/07/01 18:41:02 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -94,7 +94,7 @@ require_once(__DIR__ . '/Specs.php');
 class Validator {
 
 	protected $allow_extra	= null;
-	protected $empty_delete	= true;	# odd one out - normally defaults are false
+	protected $empty_delete	= true;	# odd one out - normally defaults are false/negative/null
 	protected $empty_null	= null;
 	protected $prefix		= '';
 	protected $remove_extra	= false;
@@ -185,7 +185,8 @@ class Validator {
 
 
 	/**
-	* Validates the given associative array.
+	* Validates the given associative array and returns the validated result.
+	* The result may be mutated depending on the options and specs used.
 	*
 	* @param array $args associative array
 	* @return array
@@ -254,7 +255,8 @@ class Validator {
 
 
 	/**
-	* Validates a plain positional array of arguments.
+	* Validates a plain positional array of arguments and returns the validated result.
+	* The result may be mutated depending on the options and specs used.
 	* Since all PHP arrays are really associative, this function reindexes the args and the specs.
 	* Because of this, you can use still use strings for keys in either the args or the specs.
 	*
@@ -263,28 +265,49 @@ class Validator {
 	* @throws ValidationException
 	*/
 	public function validate_pos(array $args) {
+		$args = array_values($args); # this make sure that args is a sequential numerically indexed array.
 		$specs = $this->specs();
 		if ($specs) {
 			$specs = array_values($this->specs()->toArray()); # make sure that specs is a sequential numerically indexed array.
-		}
-		$args = array_values($args); # this make sure that args is a sequential numerically indexed array.
-		foreach ($args as $k => &$v) {
-			if ($this->empty_null && is_string($v) && !strlen($v)) {
-				$v = null;
-			}
-			$spec = $specs && (is_array($specs) ? array_key_exists($k, $specs) : $specs->offsetExists($k)) ? $specs[$k] : null;	# array_key_exists does not work with ArrayAccess objects yet. Perhaps in the future it will.
-			if (!$spec) {
-				# note: remove_extra doesn't apply to positional arrays
-				if (!$this->allow_extra) {
-					throw new ValidationException('Unexpected parameter at index ' . $this->prefix . $k);
+			$count_args	 = count($args);
+			$count_specs = count($specs);
+
+			# Handle too many arguments
+			if ($count_args > $count_specs) {
+				if (!$this->allow_extra && !$this->remove_extra) {
+					throw new ValidationException('Too many arguments given (' . $count_args . ') for the number of specs (' . $count_specs . ')');
+					#throw new ValidationException('Unexpected parameter at index ' . $this->prefix . $k);
 				}
-				continue;
+				if ($this->remove_extra) {
+					array_splice($args, $count_specs);
+				}
 			}
-			if (!$spec->validate($v)) { # also applies before/after mutators to $v reference
-				throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
-			}
-			unset($v);
 		}
+
+		# Convert empty strings to null values if so wanted.
+		if ($this->empty_null) {
+			foreach ($args as $k => &$v) {
+				if (is_string($v) && !strlen($v)) {
+					$v = null;
+				}
+				unset($v);
+			}
+		}
+
+		# Validate
+		if ($specs) {
+			foreach ($specs as $i => $spec) {
+				$v = null;
+				if ($i < $count_args) {
+					$v =& $args[$i];
+				}
+				if (!$spec->validate($v)) { # also applies before/after mutators to $v reference
+					throw new ValidationNamedCheckException($this->prefix . $i, $spec->getLastFailure(), $v);
+				}
+				unset($v);
+			}
+		}
+
 		return $args;
 	}
 }
