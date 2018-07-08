@@ -147,7 +147,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					'score'		=> 'high',	# not allowed
 				),
 				'expect'	=> null,
-				'expect_exception'	=> 'Parameter "score" validation check "types" failed for string value "high"',
+				'expect_exception'	=> 'Parameter "score" failed validation check "types" for string value "high"',
 			),
 		);
 		foreach ($tests as $i => $test) {
@@ -202,7 +202,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> null,
@@ -210,11 +210,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
 					),
 				),
 			),
@@ -229,7 +229,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7, '', 'bla'),
@@ -237,11 +237,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
 					),
 				),
 			),
@@ -256,7 +256,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7),
@@ -264,11 +264,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
 					),
 				),
 			),
@@ -284,7 +284,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7),
@@ -292,11 +292,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
 					),
 				),
 			),
@@ -312,7 +312,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7, null, 'bla'),
@@ -320,11 +320,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" validation check "types" failed for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" validation check "mandatory" failed for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
 					),
 				),
 			),

@@ -5,7 +5,7 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.5 2018/05/26 22:51:21 cmanley Exp $
+* @version   $Id: exceptions.php,v 1.6 2018/07/08 17:23:10 cmanley Exp $
 * @package   Validate
 */
 namespace Validate;
@@ -42,7 +42,7 @@ class ValidationCheckException extends ValidationException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = 'The validation check "' . $check . '" failed for ' . gettype($this->value) . ' value';
+			$message = 'Failed validation check "' . $check . '" for ' . gettype($this->value) . ' value';
 			if (is_scalar($value)) {
 				$message .= ' ' . $this->getStringPlaceholderValue();
 			}
@@ -131,7 +131,7 @@ class ValidationNamedCheckException extends ValidationCheckException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = 'Parameter "' . $name . '" validation check "' . $check . '" failed for ' . gettype($this->value) . ' value';
+			$message = 'Parameter "' . $name . '" failed validation check "' . $check . '" for ' . gettype($this->value) . ' value';
 			if (is_scalar($value)) {
 				$message .= ' ' . $this->getStringPlaceholderValue();
 			}
