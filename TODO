@@ -1,7 +1,7 @@
-Put exceptions in their own files and own namespace subdir.
-Rename Specs to SpecCollection and make it immutable.
-Perhaps rename or move Validation into a subdir of Spec so that it is more obvious that it is a component of Spec.
+Spec: perhaps replace allow_empty and optional with allow_empty_strings and allow_null
+Spec: remove accessor methods since the __get attribute accessor is enough.
+Perhaps rename Validation to Constraints or SpecConstraints.
+In progress: Put exceptions in their own files and own namespace subdir.
 Create proper unit tests according to conventions.
-See other TODOs in classes.
 Check and improve markdown documentation and see it if can be generated.
 Improve examples.

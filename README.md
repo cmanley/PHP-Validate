@@ -60,7 +60,7 @@ $error = null;
 try {
 	save_student_score($_POST);
 }
-catch (Validate\ValidationException $e) {
+catch (Validate\Exception\ValidationException $e) {
 	$error = $e->getMessage();
 }
 if ($error) {

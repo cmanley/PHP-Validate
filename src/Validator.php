@@ -12,13 +12,17 @@ namespace Validate;
 /**
 * @ignore Require dependencies.
 */
-require_once(__DIR__ . '/exceptions.php');
-require_once(__DIR__ . '/Specs.php');
+require_once(__DIR__ . '/Exception/ValidationException.php');
+require_once(__DIR__ . '/Exception/NamedValueException.php');
+require_once(__DIR__ . '/SpecCollection.php');
 
+
+use Validate\Exception\ValidationException;
+use Validate\Exception\NamedValueException;
 
 
 /**
-* Validator objects use their internal Specs to validate and possibly modify (associative) arrays.
+* Validator objects use their internal SpecCollection to validate and possibly modify (associative) arrays.
 * Typical arrays that often require validation are those from form submissions, reading CSV records, and function array-type arguments.
 *
 * SYNOPSIS
@@ -107,10 +111,11 @@ class Validator {
 	*	delete_null        - delete key value pairs having null values
 	*
 	*	prefix - for nested validators: set this to whatever you want to prefix key names with in exception messages
-	*	specs  - Specs object or array of Spec objects; if not given, then no validation will take place
+	*	specs  - SpecCollection object or array of Spec objects; if not given, then no validation will take place
 	* </pre>
 	*
 	* @param array $args
+	* @throws \InvalidArgumentException
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
@@ -127,10 +132,10 @@ class Validator {
 				}
 				if ($k == 'specs') {
 					if (is_array($v)) {
-						$v = new Specs($v);
+						$v = new SpecCollection($v);
 					}
-					elseif (!(is_object($v) && ($v instanceOf Specs))) {
-						throw new \InvalidArgumentException("The '$k' argument must be either a Specs object or an associative array of name => Spec objects");
+					elseif (!(is_object($v) && ($v instanceOf SpecCollection))) {
+						throw new \InvalidArgumentException("The '$k' argument must be either a SpecCollection object or an associative array of name => Spec objects");
 					}
 					$this->$k = $v;
 				}
@@ -144,7 +149,7 @@ class Validator {
 				elseif (in_array($k, $boolean_options)) {
 					$this->$k = (boolean) $v;
 				}
-				elseif (substr($key,0,1) === '_') {
+				elseif (substr($k,0,1) === '_') {
 					# Silently ignore options prefixed with underscore.
 				}
 				# Process deprecated options
@@ -167,6 +172,8 @@ class Validator {
 	/**
 	* PHP magic method that provides public readonly access to protected properties.
 	* All options passed into the constructor can be read using property accessors, e.g. print $validator->allow_extra . "\n";
+	*
+	* @throws \BadMethodCallException
 	*/
 	public function __get($key) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
@@ -189,7 +196,7 @@ class Validator {
 	/**
 	* Returns the specs passed to the constructor, if any.
 	*
-	* @return Specs|null
+	* @return SpecCollection|null
 	*/
 	public function specs() {
 		return $this->specs;
@@ -202,15 +209,15 @@ class Validator {
 	*
 	* @param array $args associative array
 	* @return array
-	* @throws ValidationException
-	* @throws ValidationNamedCheckException
+	* @throws Validate\Exception\ValidationException
+	* @throws Validate\Exception\NamedValueException
 	*/
 	public function validate(array $args) {
 		# Make sure keys in $args exist that have default values
 		$specs = $this->specs();
 		if ($specs) {
 			foreach ($specs as $k => $spec) {
-				#if (!array_key_exists($k, $args) && !is_null($specs[$k]->getDefault())) {
+				#if (!array_key_exists($k, $args) && !is_null($specs[$k]->default)) {
 				if (!array_key_exists($k, $args)) {
 					$args[$k] = null;
 				}
@@ -238,7 +245,7 @@ class Validator {
 		if ($this->delete_null) {
 			foreach ($args as $k => $v) {
 				if (is_null($v) || (is_string($v) && !strlen($v))) {
-					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { # don't delete args that have default values in their Spec.
+					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->default))) { # don't delete args that have default values in their Spec.
 						unset($args[$k]);
 					}
 				}
@@ -271,7 +278,7 @@ class Validator {
 				$v =& $args[$k];
 			}
 			if (!$spec->validate($v)) { # also applies defaults or before/after mutators to $v reference
-				throw new ValidationNamedCheckException($this->prefix . $k, $spec->getLastFailure(), $v);
+				throw new NamedValueException($this->prefix . $k, $spec->getLastFailure(), $v);
 			}
 			unset($v);
 		}
@@ -287,7 +294,8 @@ class Validator {
 	*
 	* @param array $args
 	* @return array
-	* @throws ValidationException
+	* @throws Validate\Exception\ValidationException
+	* @throws Validate\Exception\NamedValueException
 	*/
 	public function validate_pos(array $args) {
 		$args = array_values($args); # this make sure that args is a sequential numerically indexed array.
@@ -336,7 +344,7 @@ class Validator {
 					$v =& $args[$i];
 				}
 				if (!$spec->validate($v)) { # also applies before/after mutators to $v reference
-					throw new ValidationNamedCheckException($this->prefix . $i, $spec->getLastFailure(), $v);
+					throw new NamedValueException($this->prefix . $i, $spec->getLastFailure(), $v);
 				}
 				unset($v);
 			}

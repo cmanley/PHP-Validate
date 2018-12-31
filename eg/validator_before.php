@@ -60,7 +60,7 @@ foreach ($records as $record) {
 		$record = $validator->validate($record);
 		print 'After validation: ' . print_r($record,true);
 	}
-	catch (Validate\ValidationException $e) {
+	catch (Validate\Exception\ValidationException $e) {
 		print 'Error at record ' . $i . ': ' . $e->getMessage() . "\n";
 		continue;
 	}

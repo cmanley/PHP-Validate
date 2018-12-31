@@ -116,12 +116,12 @@ class Test extends PHPUnit_Framework_TestCase {
 				'expect_last_failure'	=> 'types',
 			),
 		);
-		foreach ($tests as $test) {
+		foreach ($tests as $k => $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];
 			$expect_last_failure	= $test['expect_last_failure'];
 			$this->assertEquals($expect, $spec->validate($input), "validate(\"$input\") returns expected result.");
-			$this->assertEquals($expect_last_failure, $spec->getLastFailure(), "getLastFailure() returns expected result for \"$input\".");
+			$this->assertEquals($expect_last_failure, $spec->getLastFailure(), "getLastFailure() returns expected result for test $k value \"$input\".");
 		}
 	}
 
@@ -193,4 +193,70 @@ class Test extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+}
+
+
+
+if (isset($argv)) {
+	require_once(__DIR__ . '/' . Test::FILE_NAME);
+	if (1) {
+		$spec = new Validate\Spec(array(
+			'allow_empty'	=> false,
+			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
+			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
+			'description'	=> 'Email address',
+			'validation'	=> new Validate\Validation(array(
+				'type'			=> 'string',
+				'callbacks'		=> array(
+					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
+					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
+				),
+				'mb_max_length'	=> 50,
+			)),
+		));
+		$tests = array(
+			array(
+				'input'		=> 'user@hotmail.com',
+				'expect'	=> false,
+				'expect_last_failure'	=> 'no_hotmail (callback)',
+			),
+			array(
+				'input'		=> 'bgates@microsoftcom',
+				'expect'	=> false,
+				'expect_last_failure'	=> 'syntax (callback)',
+			),
+			array(
+				'input'		=> 'user@outlook.com',
+				'expect'	=> true,
+				'expect_last_failure'	=> null,
+			),
+			array(
+				'input'		=> null,
+				'expect'	=> false,
+				'expect_last_failure'	=> 'mandatory',
+			),
+			array(
+				'input'		=> 'billy_bob_gates_the_boss@at_a_very_very_long_domain_name.com',
+				'expect'	=> false,
+				'expect_last_failure'	=> 'mb_max_length',
+			),
+			array(
+				'input'		=> 12345,
+				'expect'	=> false,
+				'expect_last_failure'	=> 'types',
+			),
+		);
+		foreach ($tests as $test) {
+			$input	= $test['input'];
+			$expect	= $test['expect'];
+			$expect_last_failure	= $test['expect_last_failure'];
+			print 'validate(' . json_encode($input) . "): ";
+			$result = $spec->validate($input);
+			print json_encode($result);
+			if (!$result) {
+				print '	getLastFailure()=' . $spec->getLastFailure();
+			}
+			print "\n";
+		}
+	}
 }

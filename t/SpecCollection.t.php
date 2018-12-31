@@ -8,8 +8,8 @@ if (isset($argv)) {
 
 class Test extends PHPUnit_Framework_TestCase {
 
-	const CLASS_NAME = 'Validate\\Specs';
-	const FILE_NAME = '../src/Specs.php';
+	const CLASS_NAME = 'Validate\\SpecCollection';
+	const FILE_NAME = '../src/SpecCollection.php';
 
     public function testRequire() {
     	$file = __DIR__ . '/' . static::FILE_NAME;
@@ -131,7 +131,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'expect'	=> true,
 			),
 		);
-		$specs = new Validate\Specs(array(
+		$specs = new Validate\SpecCollection(array(
 			'firstname'	=> array(
 				'description'	=> 'First name',
 				'mb_max_length'	=> 10,
@@ -159,4 +159,104 @@ class Test extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+}
+
+
+
+
+
+if (isset($argv)) {
+	require_once(__DIR__ . '/' . Test::FILE_NAME);
+	if (1) {
+		$tests = array(
+			array(
+				'input'		=> array(
+					'firstname'	=> 'Jane',
+					'surname'	=> 'Doe',
+					'age'		=> 18,
+				),
+				'expect'	=> true,
+			),
+			array(
+				'input'		=> array(
+					'firstname'	=> 'Jane',
+					'surname'	=> 'Doe',
+				),
+				'expect'	=> true,
+			),
+			array(
+				'input'		=> array(
+					'surname'	=> 'Doe',
+					'age'		=> 18,
+				),
+				'expect'	=> false,
+			),
+			array(
+				'input'		=> array(),
+				'expect'	=> false,
+			),
+			array(
+				'input'		=> array(
+					'firstname'	=> 'too_lazy',
+					'surname'	=> 'Doe',
+				),
+				'expect'	=> false,
+			),
+			array(
+				'input'		=> array(
+					'firstname'	=> 'Jane',
+					'surname'	=> 'Doe',
+					'age'		=> '',
+				),
+				'expect'	=> true,
+			),
+			array(
+				'input'		=> array(
+					'firstname'	=> 'Jane',
+					'surname'	=> 'Doe',
+					'age'		=> null,
+				),
+				'expect'	=> true,
+			),
+		);
+		$specs = new Validate\SpecCollection(array(
+			'firstname'	=> array(
+				'description'	=> 'First name',
+				'mb_max_length'	=> 10,
+				'regex'			=> '/^[A-Z][a-z]+$/',
+				'type'			=> 'string',
+			),
+			'surname'	=> 1,	# shortcut for Spec with 'optional' => !value
+			'age'		=> array(
+				'optional'		=> true,
+				'mb_max_length'	=> 3,
+				'regex'			=> '/^\d{1,3}$/',
+				'types'			=> array('int', 'string'),
+			),
+		));
+		foreach ($tests as $name => $test) {
+			print "Test $name ";
+			$input = $test['input'];
+			$valid = true;
+			foreach ($specs as $k => $spec) {
+				$v = @$input[$k];
+				$my_valid = $spec->validate($v);
+				print "	validate $k value=" . json_encode($v) . '	valid=' . json_encode($my_valid);
+				if (!$my_valid) {
+					print '	getLastFailure()=' . $spec->getLastFailure();
+				}
+				print "\n";
+				$valid = $valid && $my_valid;
+			}
+			$input	= $test['input'];
+			$expect	= $test['expect'];
+			if ($valid === $expect) {
+				print '	OK';
+			}
+			else {
+				print '	FAIL: ' . json_encode($expect)  . ' != ' . json_encode($valid);
+			}
+			print "\n";
+		}
+	}
 }

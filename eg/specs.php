@@ -1,18 +1,18 @@
 <?php
 /**
-* Example class that demonstrates the use of the Specs class.
-* The Specs class is simply a collection of Spec objects.
-* Specs objects can be used as arrays since they implement the Countable, IteratorAggregate, and ArrayAccess interfaces.
+* Example class that demonstrates the use of the SpecCollection class.
+* The SpecCollection class is simply a collection of Spec objects.
+* SpecCollection objects can be used as arrays since they implement the Countable, IteratorAggregate, and ArrayAccess interfaces.
 */
-require_once(__DIR__ . '/../src/Specs.php');
+require_once(__DIR__ . '/../src/SpecCollection.php');
 
 
-# A Specs object can be created in 3 possible ways, all having the same effect.
+# A SpecCollection object can be created in 3 possible ways, all having the same effect.
 # The contructor is given an associative array of name => Spec pairs
 
 
-# This is the easy/lazy and my preferred way to create a Specs object with it's embedded Spec objects.
-$specs_easy = new Validate\Specs(array(
+# This is the easy/lazy and my preferred way to create a SpecCollection object with it's embedded Spec objects.
+$specs_easy = new Validate\SpecCollection(array(
 	'firstname'	=> array(
 		'description'	=> 'First name',
 		'mb_max_length'	=> 10,
@@ -29,8 +29,8 @@ $specs_easy = new Validate\Specs(array(
 ));
 
 
-# This is the less lazy way to create a Specs object with it's embedded Spec objects.
-$specs_lazy = new Validate\Specs(array(
+# This is the less lazy way to create a SpecCollection object with it's embedded Spec objects.
+$specs_lazy = new Validate\SpecCollection(array(
 	'firstname'	=> (new Validate\Spec(array(
 		'description'	=> 'First name',
 		'validation'	=> array(
@@ -51,8 +51,8 @@ $specs_lazy = new Validate\Specs(array(
 ));
 
 
-# This is the proper and most verbose way to create a Specs object with it's embedded Spec objects.
-$specs_proper = new Validate\Specs(array(
+# This is the proper and most verbose way to create a SpecCollection object with it's embedded Spec objects.
+$specs_proper = new Validate\SpecCollection(array(
 	'firstname'	=> (new Validate\Spec(array(
 		'description'	=> 'First name',
 		'validation'	=> (new Validate\Validation(array(
@@ -80,7 +80,7 @@ $specs_proper = new Validate\Specs(array(
 
 # Check if all the Spec objects are indeed identical:
 if (count(array_unique(array_map(function($specs) { return var_export($specs,true); }, array($specs_easy, $specs_lazy, $specs_proper) ))) != 1) {
-	die("The Specs objects are not identical!\n");
+	die("The SpecCollection objects are not identical!\n");
 }
 
 
@@ -142,6 +142,12 @@ $tests = array(
 
 
 $verbose = true;
+
+foreach ($specs as $k => &$spec) {
+	$spec = new Validate\Spec(['type' => 'float']);	# does nothing to $specs as the iterator works on a copy
+	unset($spec);
+}
+
 foreach ($tests as $name => $test) {
 	$input = $test['input'];
 	$verbose && print "Test: $name\n";

@@ -8,15 +8,15 @@
 */
 namespace Validate;
 
-# TODO: perhaps replace allow_empty and optional with allow_empty_strings and allow_null
-# TODO: remove accessor methods since the __get attribute accessor is enough.
-
 
 /**
 * @ignore Require dependencies.
 */
-require_once(__DIR__ . '/exceptions.php');
+require_once(__DIR__ . '/Exception/ValueException.php');
 require_once(__DIR__ . '/Validation.php');
+
+
+use Validate\Exception\ValueException;
 
 
 /**
@@ -92,12 +92,13 @@ class Spec {
 	*	optional	: boolean, if true, then null values are allowed
 	*	trim		: boolean, if true, then whitespace is trimmed off both ends of string values before validation.
 	*	description	: Optional description that can be used by user code.
-	*	validation	: Validation object
+	*	validation	: Validation (constraints) object used to validate non-null values.
 	* </pre>
 	*
 	* If unknown arguments are passed and no "validation" option is given, then the Validation object is created using those arguments.
 	*
 	* @param array $args associative array of options
+	* @throws \InvalidArgumentException
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
@@ -161,8 +162,10 @@ class Spec {
 
 
 	/**
-	* PHP magic method that provides public readonly access to protected properties.
+	* PHP magic method that provides public read-only access to protected and public properties.
 	* All options passed into the constructor can be read using property accessors, e.g. print $spec->optional . "\n";
+	*
+	* @throws \BadMethodCallException
 	*/
 	public function __get($key) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
@@ -188,6 +191,7 @@ class Spec {
 	* @return boolean
 	*/
 	public function allow_empty() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->allow_empty;
 	}
 
@@ -198,6 +202,7 @@ class Spec {
 	* @return string|null
 	*/
 	public function getDefault() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->default;
 	}
 
@@ -208,6 +213,7 @@ class Spec {
 	* @return string|null
 	*/
 	public function description() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->description;
 	}
 
@@ -218,6 +224,7 @@ class Spec {
 	* @return boolean
 	*/
 	public function before() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->before;
 	}
 
@@ -228,6 +235,7 @@ class Spec {
 	* @return boolean
 	*/
 	public function after() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->after;
 	}
 
@@ -238,6 +246,7 @@ class Spec {
 	* @return boolean
 	*/
 	public function optional() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->optional;
 	}
 
@@ -248,6 +257,7 @@ class Spec {
 	* @return boolean
 	*/
 	public function trim() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->trim;
 	}
 
@@ -258,6 +268,7 @@ class Spec {
 	* @return Validation|null
 	*/
 	public function validation() {
+		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->validation;
 	}
 
@@ -274,7 +285,7 @@ class Spec {
 
 	/**
 	* Validates the given argument reference.
-	* If 'before' or 'after' callback options were passed into the constructor,
+	* If 'allow_empty', 'before', or 'after' options were passed into the constructor,
 	* then these are applied to the argument in order to modify it in place, which is why it is passed by reference.
 	*
 	* @param mixed &$arg
@@ -289,24 +300,11 @@ class Spec {
 				$arg = null;
 			}
 		}
+
 		if (is_null($arg) && !is_null($this->default)) {
 			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
 		}
 		else {
-			if (is_null($arg)) {
-				# If optional or if the spec allows the NULL type, then continue
-				if ($this->optional) {
-					# null allowed
-				}
-				elseif ($this->validation && $this->validation->validate($arg)) {
-					# null is one of the allowed 'types' or 'allowed_values' of the Validation, so allow it.
-				}
-				else {
-					$this->last_failure = 'mandatory';
-					return false;
-				}
-			}
-
 			if (!is_null($arg) && $this->before) {
 				$x = call_user_func_array($this->before, array(&$arg)); # possible return values are: false, null (void)
 				if ($x === false) {
@@ -336,20 +334,27 @@ class Spec {
 				}
 			}
 
-			if ($this->validation) {
-				if (!$this->validation->validate($arg)) {
-					$this->last_failure = $this->validation->getLastFailure();
+			if (is_null($arg)) {
+				if (!$this->optional) {
+					$this->last_failure = 'mandatory';
 					return false;
 				}
 			}
-
-			if (!is_null($arg) && $this->after) { # Ignore the 'after' callback if the 'before' callback set the value to null.
-				$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
-				if ($x === false) {
-					$this->last_failure = 'callback after';
-					return false;
+			else {
+				if ($this->validation) {
+					if (!$this->validation->validate($arg)) {
+						$this->last_failure = $this->validation->getLastFailure();
+						return false;
+					}
 				}
-				# Assume callback 'knows' what it's doing in terms of trimming, empty strings, nulling, etc.
+				if ($this->after) {
+					$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
+					if ($x === false) {
+						$this->last_failure = 'callback after';
+						return false;
+					}
+					# Assume callback 'knows' what it's doing in terms of trimming, empty strings, nulling, etc.
+				}
 			}
 		}
 
@@ -359,14 +364,14 @@ class Spec {
 
 
 	/**
-	* This simply wraps the validate() method in order to throw a ValidationCheckException on failure instead of returning a boolean.
+	* This simply wraps the validate() method in order to throw a Validate\Exception\ValueException on failure instead of returning a boolean.
 	*
 	* @param mixed &$arg
-	* @throws ValidationCheckException
+	* @throws Validate\Exception\ValueException
 	*/
 	public function validate_ex(&$arg) {
 		if (!$this->validate($arg)) {
-			throw new ValidationCheckException($this->getLastFailure(), $arg);
+			throw new ValueException($this->getLastFailure(), $arg);
 		}
 	}
 }

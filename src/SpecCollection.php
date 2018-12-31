@@ -1,6 +1,6 @@
 <?php
 /**
-* Contains the Specs class.
+* Contains the Validate\Spec\SpecCollection class.
 *
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
@@ -15,10 +15,11 @@ namespace Validate;
 require_once(__DIR__ . '/Spec.php');
 
 
+
 /**
-* Encapsulates an (associative) array of Spec objects.
+* Encapsulates an (associative) array of Spec objects as an immutable collection.
 */
-class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
+class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 
 	private $pairs; # map of name => Spec pairs
 	static private $boolean_spec_true;
@@ -103,7 +104,7 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* @return ArrayIterator
 	*/
 	public function getIterator() {
-		return new \ArrayIterator($this->pairs);
+		return new \ArrayIterator($this->pairs);	# Uses a copy of pairs; the caller can't mutate this.
 	}
 
 
@@ -111,8 +112,9 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* Implements ArrayAccess
 	*/
 	public function offsetSet($offset, $value) {
-		static::_checkKeyValuePair($offset, $value);
-		$this->pairs[$offset] = $value;
+		throw new \BadMethodCallException("Attempt to set value of key \"$offset\" on immutable instance of " . get_class($this));
+		#static::_checkKeyValuePair($offset, $value);
+		#$this->pairs[$offset] = $value;
 	}
 
 
@@ -130,7 +132,8 @@ class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* Implements ArrayAccess
 	*/
 	public function offsetUnset($offset) {
-		unset($this->pairs[$offset]);
+		throw new \BadMethodCallException("Attempt to unset key \"$offset\" on immutable instance of " . get_class($this));
+		#unset($this->pairs[$offset]);
 	}
 
 

@@ -1,30 +1,27 @@
 <?php
 /**
-* Contains the ValidationException based classes.
+* Contains the Validate\Exception\ValueException class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2018, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
-namespace Validate;
+namespace Validate\Exception;
 
 
 /**
-* ValidationException class
-*
-* @package Validate
+* @ignore Require dependencies.
 */
-class ValidationException extends \Exception {}
-
-
+require_once(__DIR__ . '/ValidationException.php');
 
 
 /**
-* ValidationCheckException class.
+* ValueException class. Encapsulates the check name, value, and message of the failed validation.
 */
-class ValidationCheckException extends ValidationException {
+class ValueException extends ValidationException {
 	protected $check;
 	protected $value;
+
 
 	/**
 	* Constructor.
@@ -38,13 +35,14 @@ class ValidationCheckException extends ValidationException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = 'Failed validation check "' . $check . '" for ' . gettype($this->value) . ' value';
+			$message = 'Failed validation "' . $check . '" for ' . gettype($this->value) . ' value';
 			if (is_scalar($value)) {
 				$message .= ' ' . $this->getStringPlaceholderValue();
 			}
 		}
 		parent::__construct($message);
 	}
+
 
 	/**
 	* Return the name of the check that failed.
@@ -54,6 +52,7 @@ class ValidationCheckException extends ValidationException {
 	public function getCheck() {
 		return $this->check;
 	}
+
 
 	/**
 	* Return a string representation of the scalar value that caused the failure, for use in error messages.
@@ -76,6 +75,7 @@ class ValidationCheckException extends ValidationException {
 		return null;
 	}
 
+
 	/**
 	* Return the value that caused the failure.
 	*
@@ -84,6 +84,7 @@ class ValidationCheckException extends ValidationException {
 	public function getValue() {
 		return $this->value;
 	}
+
 
 	/**
 	* Return a simplified string representation of the value that caused the failure.
@@ -98,50 +99,5 @@ class ValidationCheckException extends ValidationException {
 			return gettype($this->value) . " '" . $this->value . "'";
 		}
 		return gettype($this->value);
-	}
-}
-
-
-
-
-
-/**
-* ValidationNamedCheckException class.
-*
-* @package	cmanley
-*/
-class ValidationNamedCheckException extends ValidationCheckException {
-	protected $name;
-
-	/**
-	* Constructor.
-	*
-	* @param string $name the parameter/key name
-	* @param string $check name of check that failed
-	* @param mixed $value the value that isn't valid
-	* @param string $message optional custom message
-	* @param array $options
-	*/
-	public function __construct($name, $check, $value, $message = null) {
-		$this->name  = $name;
-		$this->check = $check;
-		$this->value = $value;
-		if (is_null($message)) {
-			$message = 'Parameter "' . $name . '" failed validation check "' . $check . '" for ' . gettype($this->value) . ' value';
-			if (is_scalar($value)) {
-				$message .= ' ' . $this->getStringPlaceholderValue();
-			}
-		}
-		parent::__construct($check, $value, $message);
-	}
-
-
-	/**
-	* Return the name of the key, if known, that caused the failure.
-	*
-	* @return string|null
-	*/
-	public function getName() {
-		return $this->name;
 	}
 }

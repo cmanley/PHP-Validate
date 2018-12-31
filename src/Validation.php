@@ -12,18 +12,20 @@ namespace Validate;
 /**
 * @ignore Require dependencies.
 */
-require_once(__DIR__ . '/exceptions.php');
+require_once(__DIR__ . '/Exception/ValueException.php');
 
+
+use Validate\Exception\ValueException;
 
 
 /**
-* The Validation class encapsulates checks for validating single non-null values.
-* This class may be used stand-alone, but it is typically used as a parameter for the Spec constructor.
+* The Validation class encapsulates the constraints used for validating single NON-NULL values.
+* This class may be used stand-alone, but it is typically used as the 'validation' value in the Spec constructor.
 */
 class Validation {
 
 	# validations:
-	protected $allowed_values;    # array of scalar or null values
+	protected $allowed_values;    # array of scalar values
 	protected $allowed_values_nc; # same as $allowed_values but allowing for case-insensitive string comparisons.
 	private   $_allowed_values_nc_lowercased; # lowercased copy of allowed_values_nc
 	protected $callbacks; # associative array of key => callback pairs
@@ -49,7 +51,7 @@ class Validation {
 	*
 	* Below are the supported validations, in the order that they are applied during validation.
 	* <pre>
-	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double'), 'null' (alias of 'NULL')
+	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double')
 	*	types: array of allowed types (see type)
 	*	resource_type: only used if 'resource' is in 'types' array
 	*	max_length: max string length, for scalar types
@@ -62,13 +64,14 @@ class Validation {
 	*	regex: validation regex string, e.g. '/^.{1,50}$/s'
 	*	callback: boolean closure function that receives the value as argument
 	*	callbacks: associative array of boolean closure functions that receive the value as argument
-	*	allowed_values: array of scalar or null values;
-	*		if the test value is a scalar or null, then it must occur in 'allowed_values';
+	*	allowed_values: array of scalar values;
+	*		if the test value is a scalar, then it must occur in 'allowed_values';
 	*		if the test value is an array, then all of it's values must occur in 'allowed_values'
 	*	allowed_values_nc: case-insensitive (nc = no case) alternative to allowed_values.
 	* </pre>
 	*
 	* @param array $args associative array of validations
+	* @throws \InvalidArgumentException
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
@@ -80,8 +83,8 @@ class Validation {
 					}
 					$value = array_unique($value);
 					foreach ($value as $s) {
-						if (!(is_scalar($s) || is_null($s))) {
-							throw new \InvalidArgumentException("The \"$key\" argument must be an array of scalar or null values.");
+						if (!is_scalar($s)) {
+							throw new \InvalidArgumentException("The \"$key\" argument must be an array of scalar values.");
 						}
 					}
 					$this->$key = $value;
@@ -176,9 +179,6 @@ class Validation {
 						elseif ($type == 'float') {
 							$type = 'double';
 						}
-						elseif ($type == 'null') {
-							$type = 'NULL';
-						}
 						unset($type);
 					}
 					if (is_array($this->$key)) { # because 'type' was given
@@ -214,7 +214,7 @@ class Validation {
 				$tmp = [];
 				foreach ($this->allowed_values_nc as $v) {
 					if (is_string($v)) {
-						$v = \mb_strtolower($x);
+						$v = \mb_strtolower($v);
 						$tmp[$v] = $v;
 					}
 					else {
@@ -230,6 +230,8 @@ class Validation {
 	/**
 	* PHP magic method that provides public readonly access to protected properties.
 	* All options passed into the constructor can be read using property accessors, e.g. print $validation->regex . "\n";
+	*
+	* @throws \BadMethodCallException
 	*/
 	public function __get($key) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
@@ -267,6 +269,12 @@ class Validation {
 	* @return boolean
 	*/
 	public function validate($value) {
+		if (is_null($value)) {	# the caller (typically Spec) should not call this method with null values
+			trigger_error('NULL values are not supported by ' . __METHOD__ . ', returning true', E_USER_WARNING);
+			$this->last_failure = null;
+			return true;
+			#throw new \InvalidArgumentException('NULL values are not supported by ' . __METHOD__);	# in the future
+		}
 		if ($this->types) {
 			$k = 'types';
 			$type = gettype($value);
@@ -281,7 +289,7 @@ class Validation {
 		}
 		if ($this->allowed_values) {
 			$k = 'allowed_values';
-			if (is_null($value) || is_scalar($value)) {
+			if (is_scalar($value)) {
 				if (!in_array($value, $this->$k)) {
 					$this->last_failure = $k;
 					return false;
@@ -308,7 +316,7 @@ class Validation {
 					return false;
 				}
 			}
-			elseif (is_null($value) || is_scalar($value)) {
+			elseif (is_scalar($value)) {
 				if (!in_array($value, $this->$k)) {
 					$this->last_failure = $k;
 					return false;
@@ -328,75 +336,71 @@ class Validation {
 				return false;
 			}
 		}
-
-		# The following tests only apply to non-null values.
-		if (!is_null($value)) {
-			if ($this->resource_type) {
-				if (!(is_resource($value) && (get_resource_type($value) == $this->resource_type))) {
-					$this->last_failure = 'resource_type';
-					return false;
-				}
+		if ($this->resource_type) {
+			if (!(is_resource($value) && (get_resource_type($value) == $this->resource_type))) {
+				$this->last_failure = 'resource_type';
+				return false;
 			}
-			if (!is_null($this->max_length)) {
-				if (!(is_scalar($value) && (strlen($value) <= $this->max_length))) {
-					$this->last_failure = 'max_length';
-					return false;
-				}
+		}
+		if (!is_null($this->max_length)) {
+			if (!(is_scalar($value) && (strlen($value) <= $this->max_length))) {
+				$this->last_failure = 'max_length';
+				return false;
 			}
-			if (!is_null($this->min_length)) {
-				if (!(is_scalar($value) && (strlen($value) >= $this->min_length))) {
-					$this->last_failure = 'min_length';
-					return false;
-				}
+		}
+		if (!is_null($this->min_length)) {
+			if (!(is_scalar($value) && (strlen($value) >= $this->min_length))) {
+				$this->last_failure = 'min_length';
+				return false;
 			}
-			if (!is_null($this->mb_max_length)) {
-				if (!(is_scalar($value) && (mb_strlen($value) <= $this->mb_max_length))) {
-					$this->last_failure = 'mb_max_length';
-					return false;
-				}
+		}
+		if (!is_null($this->mb_max_length)) {
+			if (!(is_scalar($value) && (mb_strlen($value) <= $this->mb_max_length))) {
+				$this->last_failure = 'mb_max_length';
+				return false;
 			}
-			if (!is_null($this->mb_min_length)) {
-				if (!(is_scalar($value) && (mb_strlen($value) >= $this->mb_min_length))) {
-					$this->last_failure = 'mb_min_length';
-					return false;
-				}
+		}
+		if (!is_null($this->mb_min_length)) {
+			if (!(is_scalar($value) && (mb_strlen($value) >= $this->mb_min_length))) {
+				$this->last_failure = 'mb_min_length';
+				return false;
 			}
-			if (!is_null($this->max_value)) {
-				if (!(is_numeric($value) && ($value <= $this->max_value))) {
-					$this->last_failure = 'max_value';
-					return false;
-				}
+		}
+		if (!is_null($this->max_value)) {
+			if (!(is_numeric($value) && ($value <= $this->max_value))) {
+				$this->last_failure = 'max_value';
+				return false;
 			}
-			if (!is_null($this->min_value)) {
-				if (!(is_numeric($value) && ($value >= $this->min_value))) {
-					$this->last_failure = 'min_value';
-					return false;
-				}
+		}
+		if (!is_null($this->min_value)) {
+			if (!(is_numeric($value) && ($value >= $this->min_value))) {
+				$this->last_failure = 'min_value';
+				return false;
 			}
-			if ($this->isa) {
-				if (!(is_object($value) && @is_a($value, $this->isa))) {
-					$this->last_failure = 'isa';
-					return false;
-				}
+		}
+		if ($this->isa) {
+			if (!(is_object($value) && @is_a($value, $this->isa))) {
+				$this->last_failure = 'isa';
+				return false;
 			}
-			if ($this->regex) {
-				if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? intval($value) : $value))) {
-					$this->last_failure = 'regex';
-					return false;
-				}
+		}
+		if ($this->regex) {
+			if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? intval($value) : $value))) {
+				$this->last_failure = 'regex';
+				return false;
 			}
-			if ($this->callback) {
-				if (!call_user_func($this->callback, $value)) {
-					$this->last_failure = 'callback';
-					return false;
-				}
+		}
+		if ($this->callback) {
+			if (!call_user_func($this->callback, $value)) {
+				$this->last_failure = 'callback';
+				return false;
 			}
-			if ($this->callbacks) {
-				foreach ($this->callbacks as $key => $callback) {
-					if (!call_user_func($callback, $value)) {
-						$this->last_failure = "$key (callback)";
-						return false;
-					}
+		}
+		if ($this->callbacks) {
+			foreach ($this->callbacks as $key => $callback) {
+				if (!call_user_func($callback, $value)) {
+					$this->last_failure = "$key (callback)";
+					return false;
 				}
 			}
 		}
@@ -406,16 +410,16 @@ class Validation {
 
 
 	/**
-	* Validates the given value and throws a ValidationCheckException on failure.
+	* Validates the given value and throws a Validate\Exception\ValueException on failure.
 	* This method is meant for stand-alone use.
 	*
 	* @param mixed $value
-	* @throws ValidationCheckException
+	* @throws Validate\Exception\ValueException
 	*/
 	public function validate_ex($value) {
 		if (!is_null($value)) {
 			if (!$this->validate($value)) {
-				throw new ValidationCheckException($this->getLastFailure(), $value);
+				throw new ValueException($this->getLastFailure(), $value);
 			}
 		}
 	}

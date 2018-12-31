@@ -67,8 +67,8 @@ class Test extends PHPUnit_Framework_TestCase {
 		);
 		$o = new $class(array(
 			'allow_extra'	=> false,
-			'keep_null'		=> true,
-			'empty_null'	=> true,
+			'delete_null'	=> false,
+			'null_empty_strings'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
@@ -107,8 +107,8 @@ class Test extends PHPUnit_Framework_TestCase {
 		);
 		$validator = new Validate\Validator(array(
 			'allow_extra'	=> false,
-			'keep_null'	=> false,
-			'empty_null'	=> true,
+			'delete_null'	=> true,
+			'null_empty_strings'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
@@ -147,7 +147,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					'score'		=> 'high',	# not allowed
 				),
 				'expect'	=> null,
-				'expect_exception'	=> 'Parameter "score" failed validation check "types" for string value "high"',
+				'expect_exception'	=> 'Parameter "score" failed validation "types" for string value "high"',
 			),
 		);
 		foreach ($tests as $i => $test) {
@@ -159,7 +159,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			try {
 				$validated_input = $validator->validate($input);
 			}
-			catch (Validate\ValidationException $e) {
+			catch (Validate\Exception\ValidationException $e) {
 				$got_exception = $e->getMessage();
 			}
 			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
@@ -167,7 +167,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function testValidatePosSpecs() {
+	public function testValidatePosSpecCollection() {
 		$specs = array(
 			array(
 				'type'			=> 'string',
@@ -202,7 +202,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> null,
@@ -210,11 +210,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
 					),
 				),
 			),
@@ -229,7 +229,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7, '', 'bla'),
@@ -237,11 +237,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
 					),
 				),
 			),
@@ -256,7 +256,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7),
@@ -264,11 +264,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
 					),
 				),
 			),
@@ -284,7 +284,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7),
@@ -292,18 +292,18 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
 					),
 				),
 			),
-			'allow_extra is true and empty_null is true' => array(
+			'allow_extra is true and null_empty_strings is true' => array(
 				'options' => array(
 					'allow_extra'	=> true,
-					'empty_null'	=> true,
+					'null_empty_strings'	=> true,
 				),
 				'expects' => array(
 					'normal'	=> array(
@@ -312,7 +312,7 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'too few params'	=> array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
 					),
 					'too many params'	=> array(
 						'expect'			=> array('JANE', 7, null, 'bla'),
@@ -320,11 +320,11 @@ class Test extends PHPUnit_Framework_TestCase {
 					),
 					'invalid 2nd param (index 1)' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "1" failed validation check "types" for string value "high"',
+						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
 					),
 					'no params' => array(
 						'expect'			=> null,
-						'expect_exception'	=> 'Parameter "0" failed validation check "mandatory" for NULL value',
+						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
 					),
 				),
 			),
@@ -341,7 +341,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				try {
 					$validated_input = $validator->validate_pos($input);
 				}
-				catch (Validate\ValidationException $e) {
+				catch (Validate\Exception\ValidationException $e) {
 					$got_exception = $e->getMessage();
 				}
 				$this->assertEquals($expect, $validated_input, "Test \"$name\"->\"$input_name\" validate() returns expected result.");

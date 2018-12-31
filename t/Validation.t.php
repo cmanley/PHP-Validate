@@ -43,7 +43,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(is_object($o), 'Create empty object.');
 		$o = new $class(array(
 			# Some of these validations contradict each other, but it's merely a test
-			'allowed_values'	=> array('one@two.com', 'two@three.com'),
+			'allowed_values_nc'	=> array('one@two.com', 'two@three.com'),
 			'callbacks'			=> array(	 # associative array of key => callback pairs
 				'syntax'	=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 				'mx'		=> function($x) { return true; },	# dummy check
@@ -60,7 +60,6 @@ class Test extends PHPUnit_Framework_TestCase {
 			'resource_type'	=> 'stream',
 			'types'			=> array('string', 'int'),
 			'type'			=> 'scalar',
-			'nocase'		=> true,
 			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
 		));
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
