@@ -23,7 +23,9 @@ require_once(__DIR__ . '/exceptions.php');
 class Validation {
 
 	# validations:
-	protected $allowed_values;  # array of scalars
+	protected $allowed_values;    # array of scalar or null values
+	protected $allowed_values_nc; # same as $allowed_values but allowing for case-insensitive string comparisons.
+	private   $_allowed_values_nc_lowercased; # lowercased copy of allowed_values_nc
 	protected $callbacks; # associative array of key => callback pairs
 	protected $callback;
 	protected $isa;
@@ -37,8 +39,7 @@ class Validation {
 	protected $resource_type;
 	protected $types;
 
-	# options:
-	protected $nocase;
+	protected $nocase; # DEPRECATED: use allowed_values_nc instead
 
 	# other:
 	protected $last_failure;
@@ -48,7 +49,7 @@ class Validation {
 	*
 	* Below are the supported validations, in the order that they are applied during validation.
 	* <pre>
-	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double')
+	*	type: allowed type as returned by gettype(), including 'scalar', 'int' (alias of 'integer'), 'float' (alias of 'double'), 'null' (alias of 'NULL')
 	*	types: array of allowed types (see type)
 	*	resource_type: only used if 'resource' is in 'types' array
 	*	max_length: max string length, for scalar types
@@ -61,29 +62,26 @@ class Validation {
 	*	regex: validation regex string, e.g. '/^.{1,50}$/s'
 	*	callback: boolean closure function that receives the value as argument
 	*	callbacks: associative array of boolean closure functions that receive the value as argument
-	*	allowed_values: array of scalars;
-	*		if the test value is a scalar, then it must match one of the values in 'allowed_values';
-	*		if the test value is an array, then all of it's values must match any of the values in 'allowed_values'
+	*	allowed_values: array of scalar or null values;
+	*		if the test value is a scalar or null, then it must occur in 'allowed_values';
+	*		if the test value is an array, then all of it's values must occur in 'allowed_values'
+	*	allowed_values_nc: case-insensitive (nc = no case) alternative to allowed_values.
 	* </pre>
 	*
-	* The following options are supported:
-	* <pre>
-	*	nocase (boolean, makes allowed_values check case insensitive)
-	* </pre>
-	*
-	* @param array $args associative array of validations and/or options
+	* @param array $args associative array of validations
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
 			foreach ($args as $key => $value) {
 				# Process validations:
-				if ($key == 'allowed_values') {
+				if (($key == 'allowed_values') || ($key == 'allowed_values_nc')) {
 					if (!(is_array($value) && count($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be an array containing at least 1 value.");
 					}
+					$value = array_unique($value);
 					foreach ($value as $s) {
-						if (!is_scalar($s)) {
-							throw new \InvalidArgumentException("The \"$key\" argument must be an array of scalars.");
+						if (!(is_scalar($s) || is_null($s))) {
+							throw new \InvalidArgumentException("The \"$key\" argument must be an array of scalar or null values.");
 						}
 					}
 					$this->$key = $value;
@@ -178,6 +176,9 @@ class Validation {
 						elseif ($type == 'float') {
 							$type = 'double';
 						}
+						elseif ($type == 'null') {
+							$type = 'NULL';
+						}
 						unset($type);
 					}
 					if (is_array($this->$key)) { # because 'type' was given
@@ -187,18 +188,40 @@ class Validation {
 						$this->$key = $value;
 					}
 				}
-
-				# Process boolean options
-				elseif (in_array($key, array('nocase'))) {
-					$this->$key = (boolean) $value;
-				}
-
 				elseif (substr($key,0,1) === '_') {
 					# Silently ignore options prefixed with underscore.
+				}
+				# Deprecated option(s)
+				elseif ($key == 'nocase') {
+					trigger_error('Option "nocase" is deprecated; use "allowed_values_nc" instead', E_USER_DEPRECATED);
+					$this->$key = (boolean) $value;
 				}
 				else {
 					throw new \InvalidArgumentException("Unknown argument \"$key\".");
 				}
+			}
+
+			# Handle deprecated option "nocase"
+			if (!is_null($this->nocase)) {
+				if ($this->nocase && $this->allowed_values && !$this->allowed_values_nc) {
+					$this->allowed_values_nc = $this->allowed_values;
+					$this->allowed_values = null;
+				}
+			}
+
+			# Force all strings in copy of allowed_values_nc to lowercase.
+			if ($this->allowed_values_nc) {
+				$tmp = [];
+				foreach ($this->allowed_values_nc as $v) {
+					if (is_string($v)) {
+						$v = \mb_strtolower($x);
+						$tmp[$v] = $v;
+					}
+					else {
+						$tmp []= $v;
+					}
+				}
+				$this->_allowed_values_nc_lowercased = $tmp;
 			}
 		}
 	}
@@ -237,118 +260,143 @@ class Validation {
 
 
 	/**
-	* Validates the given argument if it is non-null.
+	* Tests the validity of the given value.
+	* If the result is false, then you can call getLastFailure() to get the name of the test that validation failed on.
 	*
-	* @param mixed $arg
+	* @param mixed $value
 	* @return boolean
 	*/
-	public function validate($arg) {
-		if (!is_null($arg)) {
-			if ($this->types) {
-				$type = gettype($arg);
-				if (!(
-					in_array($type, $this->types)
-					||
-					(is_scalar($arg) && in_array('scalar', $this->types))
-				)) {
-					$this->last_failure = 'types';
+	public function validate($value) {
+		if ($this->types) {
+			$k = 'types';
+			$type = gettype($value);
+			if (!(
+				in_array($type, $this->$k)
+				||
+				(is_scalar($value) && in_array('scalar', $this->$k))
+			)) {
+				$this->last_failure = $k;
+				return false;
+			}
+		}
+		if ($this->allowed_values) {
+			$k = 'allowed_values';
+			if (is_null($value) || is_scalar($value)) {
+				if (!in_array($value, $this->$k)) {
+					$this->last_failure = $k;
 					return false;
 				}
 			}
+			elseif (is_array($value)) {	# do all the given values in $value appear in allowed_values?
+				if ($value) {
+					if (count($value) != count(array_intersect($value, $this->$k))) {
+						$this->last_failure = $k;
+						return false;
+					}
+				}
+			}
+			else {
+				$this->last_failure = $k;
+				return false;
+			}
+		}
+		if ($this->_allowed_values_nc_lowercased) {
+			$k = 'allowed_values_nc';
+			if (is_string($value)) {
+				if (!in_array(mb_strtolower($value), $this->_allowed_values_nc_lowercased)) {
+					$this->last_failure = $k;
+					return false;
+				}
+			}
+			elseif (is_null($value) || is_scalar($value)) {
+				if (!in_array($value, $this->$k)) {
+					$this->last_failure = $k;
+					return false;
+				}
+			}
+			elseif (is_array($value)) {	# do all the given values in $value appear in allowed_values_nc?
+				if ($value) {
+					$values_lc = array_map(function($x) { return is_string($x) ? \mb_strtolower($x) : $x; }, $value);
+					if (count($value) != count(array_intersect($values_lc, $this->_allowed_values_nc_lowercased))) {
+						$this->last_failure = $k;
+						return false;
+					}
+				}
+			}
+			else {
+				$this->last_failure = $k;
+				return false;
+			}
+		}
+
+		# The following tests only apply to non-null values.
+		if (!is_null($value)) {
 			if ($this->resource_type) {
-				if (!(is_resource($arg) && (get_resource_type($arg) == $this->resource_type))) {
+				if (!(is_resource($value) && (get_resource_type($value) == $this->resource_type))) {
 					$this->last_failure = 'resource_type';
 					return false;
 				}
 			}
 			if (!is_null($this->max_length)) {
-				if (!(is_scalar($arg) && (strlen($arg) <= $this->max_length))) {
+				if (!(is_scalar($value) && (strlen($value) <= $this->max_length))) {
 					$this->last_failure = 'max_length';
 					return false;
 				}
 			}
 			if (!is_null($this->min_length)) {
-				if (!(is_scalar($arg) && (strlen($arg) >= $this->min_length))) {
+				if (!(is_scalar($value) && (strlen($value) >= $this->min_length))) {
 					$this->last_failure = 'min_length';
 					return false;
 				}
 			}
 			if (!is_null($this->mb_max_length)) {
-				if (!(is_scalar($arg) && (mb_strlen($arg) <= $this->mb_max_length))) {
+				if (!(is_scalar($value) && (mb_strlen($value) <= $this->mb_max_length))) {
 					$this->last_failure = 'mb_max_length';
 					return false;
 				}
 			}
 			if (!is_null($this->mb_min_length)) {
-				if (!(is_scalar($arg) && (mb_strlen($arg) >= $this->mb_min_length))) {
+				if (!(is_scalar($value) && (mb_strlen($value) >= $this->mb_min_length))) {
 					$this->last_failure = 'mb_min_length';
 					return false;
 				}
 			}
 			if (!is_null($this->max_value)) {
-				if (!(is_numeric($arg) && ($arg <= $this->max_value))) {
+				if (!(is_numeric($value) && ($value <= $this->max_value))) {
 					$this->last_failure = 'max_value';
 					return false;
 				}
 			}
 			if (!is_null($this->min_value)) {
-				if (!(is_numeric($arg) && ($arg >= $this->min_value))) {
+				if (!(is_numeric($value) && ($value >= $this->min_value))) {
 					$this->last_failure = 'min_value';
 					return false;
 				}
 			}
 			if ($this->isa) {
-				if (!(is_object($arg) && @is_a($arg, $this->isa))) {
+				if (!(is_object($value) && @is_a($value, $this->isa))) {
 					$this->last_failure = 'isa';
 					return false;
 				}
 			}
 			if ($this->regex) {
-				if (!(is_scalar($arg) && preg_match($this->regex, is_bool($arg) ? intval($arg) : $arg))) {
+				if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? intval($value) : $value))) {
 					$this->last_failure = 'regex';
 					return false;
 				}
 			}
 			if ($this->callback) {
-				if (!call_user_func($this->callback, $arg)) {
+				if (!call_user_func($this->callback, $value)) {
 					$this->last_failure = 'callback';
 					return false;
 				}
 			}
 			if ($this->callbacks) {
 				foreach ($this->callbacks as $key => $callback) {
-					if (!call_user_func($callback, $arg)) {
+					if (!call_user_func($callback, $value)) {
 						$this->last_failure = "$key (callback)";
 						return false;
 					}
-				}
-			}
-			if ($this->allowed_values) {
-				if (is_scalar($arg)) {
-					if (!($this->nocase ? in_array(mb_strtolower($arg), array_map('mb_strtolower', $this->allowed_values)) : in_array($arg, $this->allowed_values))) {
-						$this->last_failure = 'allowed_values';
-						return false;
-					}
-				}
-				elseif (is_array($arg)) {
-					if ($arg) {
-						if ($this->nocase) {
-							if (count($arg) != count(array_intersect(array_map('mb_strtolower', $arg), array_map('mb_strtolower', $this->allowed_values)))) {
-								$this->last_failure = 'allowed_values';
-								return false;
-							}
-						}
-						else {
-							if (count($arg) != count(array_intersect($arg, $this->allowed_values))) {
-								$this->last_failure = 'allowed_values';
-								return false;
-							}
-						}
-					}
-				}
-				else {
-					$this->last_failure = 'allowed_values';
-					return false;
 				}
 			}
 		}
@@ -358,16 +406,16 @@ class Validation {
 
 
 	/**
-	* Validates the given argument and throws a ValidationCheckException on failure.
+	* Validates the given value and throws a ValidationCheckException on failure.
 	* This method is meant for stand-alone use.
 	*
-	* @param mixed $arg
+	* @param mixed $value
 	* @throws ValidationCheckException
 	*/
-	public function validate_ex($arg) {
-		if (!is_null($arg)) {
-			if (!$this->validate($arg)) {
-				throw new ValidationCheckException($this->getLastFailure(), $arg);
+	public function validate_ex($value) {
+		if (!is_null($value)) {
+			if (!$this->validate($value)) {
+				throw new ValidationCheckException($this->getLastFailure(), $value);
 			}
 		}
 	}
