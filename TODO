@@ -1,0 +1,7 @@
+Put exceptions in their own files and own namespace subdir.
+Rename Specs to SpecCollection and make it immutable.
+Perhaps rename or move Validation into a subdir of Spec so that it is more obvious that it is a component of Spec.
+Create proper unit tests according to conventions.
+See other TODOs in classes.
+Check and improve markdown documentation and see it if can be generated.
+Improve examples.
