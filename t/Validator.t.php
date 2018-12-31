@@ -67,7 +67,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		);
 		$o = new $class(array(
 			'allow_extra'	=> false,
-			'empty_delete'	=> false,
+			'keep_null'		=> true,
 			'empty_null'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,
@@ -107,7 +107,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		);
 		$validator = new Validate\Validator(array(
 			'allow_extra'	=> false,
-			'empty_delete'	=> false,
+			'keep_null'	=> false,
 			'empty_null'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,

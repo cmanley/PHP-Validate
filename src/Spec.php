@@ -2,17 +2,9 @@
 /**
 * Contains the Spec class.
 *
-* Dependencies:
-* <pre>
-* exceptions.php
-* Validation.php
-* </pre>
-*
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Spec.php,v 1.7 2018/05/26 22:51:21 cmanley Exp $
-* @package   Validate
 */
 namespace Validate;
 
@@ -70,8 +62,6 @@ require_once(__DIR__ . '/Validation.php');
 *
 *	# And finally validating something:
 *	print (int) $spec->validate("hay") . "\n";
-*
-* @package	cmanley
 */
 class Spec {
 

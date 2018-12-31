@@ -2,10 +2,6 @@
 /**
 * Example script that demonstrates the use of the 'before' function in a spec.
 * The 'before' function is executed before other spec validations have been performed.
-*
-* @author   Craig Manley
-* @version  $Id: validator_before.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
-* @package  Validate
 */
 require_once(__DIR__ . '/../src/Validator.php');
 

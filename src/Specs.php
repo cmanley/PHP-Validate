@@ -2,16 +2,9 @@
 /**
 * Contains the Specs class.
 *
-* Dependencies:
-* <pre>
-* Spec.php
-* </pre>
-*
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Specs.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
-* @package   cmanley
 */
 namespace Validate;
 
@@ -24,8 +17,6 @@ require_once(__DIR__ . '/Spec.php');
 
 /**
 * Encapsulates an (associative) array of Spec objects.
-*
-* @package	DAO
 */
 class Specs implements \Countable, \IteratorAggregate, \ArrayAccess {
 

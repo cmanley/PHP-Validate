@@ -2,17 +2,9 @@
 /**
 * Contains the Validator class.
 *
-* Dependencies:
-* <pre>
-* exceptions.php
-* Specs.php
-* </pre>
-*
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validator.php,v 1.6 2018/07/01 18:53:27 cmanley Exp $
-* @package   Validate
 */
 namespace Validate;
 
@@ -88,16 +80,17 @@ require_once(__DIR__ . '/Specs.php');
 *		return str_replace($search, $replace, $subject);
 *	}
 *	print my_str_replace('him', 'her', $string);
-*
-* @package	cmanley
 */
 class Validator {
 
-	protected $allow_extra	= null;
-	protected $empty_delete	= true;	# odd one out - normally defaults are false/negative/null
-	protected $empty_null	= null;
-	protected $prefix		= '';
+	protected $allow_extra	= false;
 	protected $remove_extra	= false;
+
+	protected $trim			= false;
+	protected $empty_null	= false;
+	protected $keep_null	= false;
+
+	protected $prefix		= '';
 	protected $specs		= null;
 
 
@@ -106,18 +99,28 @@ class Validator {
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_extra		- allow extra parameters for which there are no specs.
-	*	empty_delete	- delete empty key value pairs; default true
-	*	empty_null		- null values of empty key value pairs
-	*	prefix			- for nested validators: set this to whatever you want to prefix parameter names with in exception messages.
-	*	remove_extra	- remove extra parameters for which there are no specs.
-	*	specs			- if not given, then no validation will take place
+	*	allow_extra  - allow extra parameters for which there are no specs
+	*	remove_extra - remove extra parameters for which there are no specs
+	*
+	*	trim         - trim all string values; applied before the options empty_null and keep_null
+	*	empty_null   - replace empty string values with null; applied before the option keep_null
+	*	keep_null    - keep key value pairs having null values; by default they are removed
+	*
+	*	prefix       - for nested validators: set this to whatever you want to prefix key names with in exception messages
+	*	specs        - Specs object or array of Spec objects; if not given, then no validation will take place
 	* </pre>
 	*
 	* @param array $args
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
+			$boolean_options = array(
+				'allow_extra',
+				'remove_extra',
+				'empty_null',
+				'keep_null',
+				'trim',
+			);
 			foreach ($args as $k => $v) {
 				if (is_null($v)) {
 					continue;
@@ -138,11 +141,16 @@ class Validator {
 					$this->$k = $v;
 				}
 				# Process boolean options
-				elseif (in_array($k, array('allow_extra', 'empty_delete', 'empty_null', 'remove_extra'))) {
+				elseif (in_array($k, $boolean_options)) {
 					$this->$k = (boolean) $v;
 				}
 				elseif (substr($key,0,1) === '_') {
 					# Silently ignore options prefixed with underscore.
+				}
+				# Process deprecated options
+				elseif ($k == 'empty_delete') {
+					$this->keep_null = !$v;
+					trigger_error("Option $k is deprecated. Use it's inverse keep_null instead.", E_USER_DEPRECATED);
 				}
 				else {
 					throw new \InvalidArgumentException("Unhandled option '$k'");
@@ -175,9 +183,9 @@ class Validator {
 
 
 	/**
-	* Returns the specs passed to the constructor.
+	* Returns the specs passed to the constructor, if any.
 	*
-	* @return array|null
+	* @return Specs|null
 	*/
 	public function specs() {
 		return $this->specs;
@@ -204,21 +212,32 @@ class Validator {
 				}
 			}
 		}
-		if ($this->empty_delete) {
-			foreach ($args as $k => $v) {
-				if (is_null($v) || (is_string($v) && !strlen($v))) {
-					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { # don't delete arguments that have default values
-						unset($args[$k]);
-					}
+		# Trim string values if so requested
+		if ($this->trim) {
+			foreach ($args as $k => &$v) {
+				if (is_string($v)) {
+					$v = trim($v);
 				}
+				unset($v);
 			}
 		}
-		elseif ($this->empty_null) {
+		# Replace empty string values with null if so requested
+		if ($this->empty_null) {
 			foreach ($args as $k => &$v) {
 				if (is_string($v) && !strlen($v)) {
 					$v = null;
 				}
 				unset($v);
+			}
+		}
+		# Remove key value pairs having null values if so requested
+		if (!$this->keep_null) {
+			foreach ($args as $k => $v) {
+				if (is_null($v) || (is_string($v) && !strlen($v))) {
+					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { # don't delete args that have default values in their Spec.
+						unset($args[$k]);
+					}
+				}
 			}
 		}
 
@@ -284,7 +303,16 @@ class Validator {
 			}
 		}
 
-		# Convert empty strings to null values if so wanted.
+		# Trim string values if so requested
+		if ($this->trim) {
+			foreach ($args as $k => &$v) {
+				if (is_string($v)) {
+					$v = trim($v);
+				}
+				unset($v);
+			}
+		}
+		# Replace empty string values with null if so requested
 		if ($this->empty_null) {
 			foreach ($args as $k => &$v) {
 				if (is_string($v) && !strlen($v)) {

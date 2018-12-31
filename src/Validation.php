@@ -2,16 +2,9 @@
 /**
 * Contains the Validation class.
 *
-* Dependencies:
-* <pre>
-* exceptions.php
-* </pre>
-*
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: Validation.php,v 1.3 2018/05/26 22:55:49 cmanley Exp $
-* @package   Validate
 */
 namespace Validate;
 
@@ -26,8 +19,6 @@ require_once(__DIR__ . '/exceptions.php');
 /**
 * The Validation class encapsulates checks for validating single non-null values.
 * This class may be used stand-alone, but it is typically used as a parameter for the Spec constructor.
-*
-* @package	cmanley
 */
 class Validation {
 

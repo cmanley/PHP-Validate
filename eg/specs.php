@@ -3,10 +3,6 @@
 * Example class that demonstrates the use of the Specs class.
 * The Specs class is simply a collection of Spec objects.
 * Specs objects can be used as arrays since they implement the Countable, IteratorAggregate, and ArrayAccess interfaces.
-*
-* @author   Craig Manley
-* @version  $Id: specs.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
-* @package  Validate
 */
 require_once(__DIR__ . '/../src/Specs.php');
 

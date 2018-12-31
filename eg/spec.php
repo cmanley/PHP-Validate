@@ -4,10 +4,6 @@
 * A Spec class contains a Validation class as well as some extra attributes.
 * See it's contructor documentation for all the possible parameters.
 * The Spec class is rarely used stand-alone as it is only able to validate a single value.
-*
-* @author   Craig Manley
-* @version  $Id: spec.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
-* @package  Validate
 */
 require_once(__DIR__ . '/../src/Spec.php');
 

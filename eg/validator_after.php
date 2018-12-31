@@ -2,10 +2,6 @@
 /**
 * Example script that demonstrates the use of the 'after' function in a spec.
 * The 'after' function is executed after other spec validations have been performed.
-*
-* @author   Craig Manley
-* @version  $Id: validator_after.php,v 1.4 2018/05/26 22:55:49 cmanley Exp $
-* @package  Validate
 */
 require_once(__DIR__ . '/../src/Validator.php');
 

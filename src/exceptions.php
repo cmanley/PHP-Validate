@@ -5,8 +5,6 @@
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
-* @version   $Id: exceptions.php,v 1.6 2018/07/08 17:23:10 cmanley Exp $
-* @package   Validate
 */
 namespace Validate;
 
@@ -14,7 +12,7 @@ namespace Validate;
 /**
 * ValidationException class
 *
-* @package	cmanley
+* @package Validate
 */
 class ValidationException extends \Exception {}
 
@@ -23,8 +21,6 @@ class ValidationException extends \Exception {}
 
 /**
 * ValidationCheckException class.
-*
-* @package	cmanley
 */
 class ValidationCheckException extends ValidationException {
 	protected $check;

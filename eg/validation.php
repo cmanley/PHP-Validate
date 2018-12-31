@@ -2,10 +2,6 @@
 /**
 * Example script that demonstrates the use of the Validation class.
 * The Validation class is rarely used stand-alone as it is only able to validate a single value.
-*
-* @author   Craig Manley
-* @version  $Id: validation.php,v 1.3 2016/06/13 20:04:08 cmanley Exp $
-* @package  Validate
 */
 require_once(__DIR__ . '/../src/Validation.php');
 
