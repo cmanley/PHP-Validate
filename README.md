@@ -24,7 +24,7 @@ function save_student_score(array $params) {
 	// Create the validator object. By using static, it is only created once and persists for all function calls.
 	static $validator = new \Validate\Validator(array(
 		'trim' => true, // trim all string values
-		'empty_null' => true, // convert empty string values to null
+		'null_empty_strings' => true, // convert empty string values to null
 		'specs' => array(
 			'name'	=> array(
 				'type' => 'string',
