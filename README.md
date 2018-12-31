@@ -8,6 +8,11 @@ You can use it to validate almost anything, but typically it can be used for (st
 ### Requirements
 *  PHP 5.3 or newer
 
+### Installation
+Download or checkout from git, or install the packagist package cmanley/validate.
+
+**WARNING**: This is a still a work in early progress and the API can change at any time. So use fixed releases and don't download from the master branch unless you're prepared to fix things yourself.
+
 ### Synopsis
 
 **Example of function associative array parameter validation:**
