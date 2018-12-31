@@ -8,6 +8,9 @@
 */
 namespace Validate;
 
+# TODO: perhaps replace allow_empty and optional with allow_empty_strings and allow_null
+# TODO: remove accessor methods since the __get attribute accessor is enough.
+
 
 /**
 * @ignore Require dependencies.
@@ -76,7 +79,6 @@ class Spec {
 
 	# other:
 	protected $last_failure;
-	protected $use_preg_utf8_flag;	# for preg trimming
 
 	/**
 	* Constructor.
@@ -99,6 +101,7 @@ class Spec {
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
+			$boolean_options = array('allow_empty', 'optional', 'trim');
 			$unknown_args = array();
 			foreach ($args as $key => $value) {
 				if ($key == 'validation') {
@@ -132,7 +135,7 @@ class Spec {
 					}
 				}
 				# Process boolean options
-				elseif (in_array($key, array('allow_empty', 'optional', 'trim'))) {
+				elseif (in_array($key, $boolean_options)) {
 					$this->$key = (boolean) $value;
 				}
 
@@ -154,7 +157,6 @@ class Spec {
 				}
 			}
 		}
-		$this->use_preg_utf8_flag = $this->trim && (mb_strtoupper(mb_internal_encoding()) == 'UTF-8');
 	}
 
 
@@ -281,12 +283,7 @@ class Spec {
 	public function validate(&$arg) {
 		if (is_string($arg)) {
 			if ($this->trim) {
-				if ($this->use_preg_utf8_flag) {
-					$arg = preg_replace('/^\s+|\s+$/u', '', $arg);
-				}
-				else {
-					$arg = trim($arg);
-				}
+				$arg = trim($arg);	# trim is multibyte safe
 			}
 			if (!strlen($arg) && !$this->allow_empty) {
 				$arg = null;
@@ -297,54 +294,65 @@ class Spec {
 		}
 		else {
 			if (is_null($arg)) {
-				if (!$this->optional) {
+				# If optional or if the spec allows the NULL type, then continue
+				if ($this->optional) {
+					# null allowed
+				}
+				elseif ($this->validation && $this->validation->validate($arg)) {
+					# null is one of the allowed 'types' or 'allowed_values' of the Validation, so allow it.
+				}
+				else {
 					$this->last_failure = 'mandatory';
 					return false;
 				}
 			}
-			else {
-				if ($this->before) {
-					$x = call_user_func_array($this->before, array(&$arg)); # possible return values are: false, null (void)
-					if ($x === false) {
-						$this->last_failure = 'callback before';
-						return false;
+
+			if (!is_null($arg) && $this->before) {
+				$x = call_user_func_array($this->before, array(&$arg)); # possible return values are: false, null (void)
+				if ($x === false) {
+					$this->last_failure = 'callback before';
+					return false;
+				}
+				if (is_string($arg)) {
+					if ($this->trim) {
+						$arg = trim($arg);	# trim is multibyte safe
 					}
-					if (is_string($arg)) {
-						if ($this->trim) {
-							if ($this->use_preg_utf8_flag) {
-								$arg = preg_replace('/^\s+|\s+$/u', '', $arg);
-							}
-							else {
-								$arg = trim($arg);
-							}
-						}
-						if (!strlen($arg) && !$this->allow_empty) {
-							$arg = null;
-						}
-					}
-					if (is_null($arg)) {
-						if (!$this->optional) {
-							$this->last_failure = 'mandatory (set to null by callback)';
-							return false;
-						}
+					if (!strlen($arg) && !$this->allow_empty) {
+						$arg = null;
 					}
 				}
-				if ($this->validation) {
-					if (!$this->validation->validate($arg)) {
-						$this->last_failure = $this->validation->getLastFailure();
+				if (is_null($arg)) { # if set to null by "before" callback...
+					# If optional or if the spec allows the NULL type, then continue
+					if ($this->optional) {
+						# null allowed
+					}
+					elseif ($this->validation && $this->validation->validate($arg)) {
+						# null is one of the allowed 'types' or 'allowed_values' of the Validation, so allow it.
+					}
+					else {
+						$this->last_failure = 'mandatory (set to null by before callback)';
 						return false;
 					}
-				}
-				if ($this->after && !is_null($arg)) {	# Ignore the 'after' callback if the 'before' callback set the value to null.
-					$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
-					if ($x === false) {
-						$this->last_failure = 'callback after';
-						return false;
-					}
-					# Assume callback 'knows' what it wants in terms of trimming, empty strings, etc.
 				}
 			}
+
+			if ($this->validation) {
+				if (!$this->validation->validate($arg)) {
+					$this->last_failure = $this->validation->getLastFailure();
+					return false;
+				}
+			}
+
+			if (!is_null($arg) && $this->after) { # Ignore the 'after' callback if the 'before' callback set the value to null.
+				$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
+				if ($x === false) {
+					$this->last_failure = 'callback after';
+					return false;
+				}
+				# Assume callback 'knows' what it's doing in terms of trimming, empty strings, nulling, etc.
+			}
 		}
+
 		$this->last_failure = null;
 		return true;
 	}
