@@ -29,8 +29,8 @@ require_once(__DIR__ . '/Specs.php');
 *		'specs' => array(
 *			'name'	=> array(
 *				'type'			=> 'string',
-*				'max_length'	=> 2,
-*				'max_length'	=> 30,
+*				'mb_max_length'	=> 2,
+*				'mb_max_length'	=> 30,
 *			),
 *			'birthdate' => array(
 *				'type'	=> 'string',
@@ -83,31 +83,31 @@ require_once(__DIR__ . '/Specs.php');
 */
 class Validator {
 
-	protected $allow_extra	= false;
-	protected $remove_extra	= false;
+	protected $allow_extra  = false;
+	protected $remove_extra = false;
 
-	protected $trim			= false;
-	protected $empty_null	= false;
-	protected $keep_null	= false;
+	protected $trim               = false;
+	protected $null_empty_strings = false;
+	protected $delete_null        = false;
 
-	protected $prefix		= '';
-	protected $specs		= null;
+	protected $prefix = '';
+	protected $specs  = null;
 
 
 	/**
 	* Constructor.
 	*
-	* The following options are supported:
+	* The following options are supported and affect the behaviour of the validate() and validate_pos() methods:
 	* <pre>
 	*	allow_extra  - allow extra parameters for which there are no specs
 	*	remove_extra - remove extra parameters for which there are no specs
 	*
-	*	trim         - trim all string values; applied before the options empty_null and keep_null
-	*	empty_null   - replace empty string values with null; applied before the option keep_null
-	*	keep_null    - keep key value pairs having null values; by default they are removed
+	*	trim               - trim all string values; applied before the options null_empty_strings and delete_null
+	*	null_empty_strings - replace empty string values with null; applied before the option delete_null
+	*	delete_null        - delete key value pairs having null values
 	*
-	*	prefix       - for nested validators: set this to whatever you want to prefix key names with in exception messages
-	*	specs        - Specs object or array of Spec objects; if not given, then no validation will take place
+	*	prefix - for nested validators: set this to whatever you want to prefix key names with in exception messages
+	*	specs  - Specs object or array of Spec objects; if not given, then no validation will take place
 	* </pre>
 	*
 	* @param array $args
@@ -117,8 +117,8 @@ class Validator {
 			$boolean_options = array(
 				'allow_extra',
 				'remove_extra',
-				'empty_null',
-				'keep_null',
+				'null_empty_strings',
+				'delete_null',
 				'trim',
 			);
 			foreach ($args as $k => $v) {
@@ -149,8 +149,12 @@ class Validator {
 				}
 				# Process deprecated options
 				elseif ($k == 'empty_delete') {
-					$this->keep_null = !$v;
-					trigger_error("Option $k is deprecated. Use it's inverse keep_null instead.", E_USER_DEPRECATED);
+					$this->delete_null = $v;
+					trigger_error("Option $k is deprecated. Use delete_null instead.", E_USER_DEPRECATED);
+				}
+				elseif ($k == 'empty_null') {
+					$this->null_empty_strings = $v;
+					trigger_error("Option $k is deprecated. Use null_empty_strings instead.", E_USER_DEPRECATED);
 				}
 				else {
 					throw new \InvalidArgumentException("Unhandled option '$k'");
@@ -162,7 +166,7 @@ class Validator {
 
 	/**
 	* PHP magic method that provides public readonly access to protected properties.
-	* All options passed into the constructor can be read using property accessors, e.g. print $spec->optional . "\n";
+	* All options passed into the constructor can be read using property accessors, e.g. print $validator->allow_extra . "\n";
 	*/
 	public function __get($key) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
@@ -222,7 +226,7 @@ class Validator {
 			}
 		}
 		# Replace empty string values with null if so requested
-		if ($this->empty_null) {
+		if ($this->null_empty_strings) {
 			foreach ($args as $k => &$v) {
 				if (is_string($v) && !strlen($v)) {
 					$v = null;
@@ -231,7 +235,7 @@ class Validator {
 			}
 		}
 		# Remove key value pairs having null values if so requested
-		if (!$this->keep_null) {
+		if ($this->delete_null) {
 			foreach ($args as $k => $v) {
 				if (is_null($v) || (is_string($v) && !strlen($v))) {
 					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->getDefault()))) { # don't delete args that have default values in their Spec.
@@ -246,19 +250,21 @@ class Validator {
 			return $args;
 		}
 
-		# Validate args
-		foreach ($args as $k => &$v) {
+		# Check if a Spec exists for each key in args
+		foreach ($args as $k => $v) {
 			if ($specs->offsetExists($k)) {
-				# nop
+				# good; do nothing
 			}
 			elseif ($this->remove_extra) {
-				unset($args[$k]);
+				unset($args[$k]);	# safe since foreach operates on a copy
 			}
 			elseif (!$this->allow_extra) {
 				throw new ValidationException("Unknown key '" . $this->prefix . $k . "'");
 			}
 			unset($v);
 		}
+
+		# Validate args against specs
 		foreach ($specs as $k => $spec) {
 			$v = null;
 			if (array_key_exists($k, $args)) {
@@ -269,7 +275,7 @@ class Validator {
 			}
 			unset($v);
 		}
-		return $args; # same as input if no befores were applied
+		return $args; # same as input if no before/after mutators were called
 	}
 
 
@@ -313,7 +319,7 @@ class Validator {
 			}
 		}
 		# Replace empty string values with null if so requested
-		if ($this->empty_null) {
+		if ($this->null_empty_strings) {
 			foreach ($args as $k => &$v) {
 				if (is_string($v) && !strlen($v)) {
 					$v = null;
