@@ -1,6 +1,6 @@
 <?php
 /**
-* Contains the Validate\Spec\SpecCollection class.
+* Contains the Validate\SpecCollection class.
 *
 * @author    Craig Manley
 * @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
