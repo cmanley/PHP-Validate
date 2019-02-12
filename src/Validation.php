@@ -107,7 +107,7 @@ class Validation {
 					$this->$key = $value;
 				}
 				elseif ($key == 'isa') {
-					if (!is_string($value) && strlen($value)) {
+					if (!(is_string($value) && strlen($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be a valid class name.");
 					}
 					$this->$key = $value;
@@ -125,19 +125,19 @@ class Validation {
 					$this->$key = $value;
 				}
 				elseif ($key == 'regex') {
-					if (!is_string($value) && strlen($value)) {
+					if (!(is_string($value) && strlen($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be a valid regular expression string.");
 					}
 					$this->$key = $value;
 				}
 				elseif ($key == 'resource_type') {
-					if (!is_string($value) && strlen($value)) {
+					if (!(is_string($value) && strlen($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be a valid resource type.");
 					}
 					$this->$key = $value;
 				}
 				elseif ($key == 'type') {
-					if (!is_string($value) && strlen($value)) {
+					if (!(is_string($value) && strlen($value))) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be a type string.");
 					}
 					if ($value == 'int') {
