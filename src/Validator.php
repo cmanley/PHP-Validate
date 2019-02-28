@@ -215,7 +215,7 @@ class Validator {
 	public function validate(array $args) {
 		if (!is_array($args)) {
 			if (empty($args)) {
-				$args = [];	# be silently tolerant of null and false values. PHP will have emitted a E_RECOVERABLE_ERROR warning anyway.
+				$args = array();	# be silently tolerant of null and false values. PHP will have emitted a E_RECOVERABLE_ERROR warning anyway.
 			}
 			else {
 				throw new \InvalidArgumentException(__METHOD__ . ' requires an array argument but was given a ' . gettype($args) . ' instead');
