@@ -275,6 +275,7 @@ class Validation {
 			return true;
 			#throw new \InvalidArgumentException('NULL values are not supported by ' . __METHOD__);	# in the future
 		}
+		$tests = 0;	# count tests performed for determining how to handle result for null $value which shouldn't be passed in the first place; see end of method.
 		if ($this->types) {
 			$k = 'types';
 			$type = gettype($value);
@@ -286,11 +287,13 @@ class Validation {
 				$this->last_failure = $k;
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->allowed_values) {
 			$k = 'allowed_values';
-			if (is_scalar($value)) {
-				if (!in_array($value, $this->$k)) {
+			if (is_scalar($value) || is_null($value)) {
+				$strict = is_bool($value) || is_null($value) || ($value === '');
+				if (!in_array($value, $this->$k, $strict)) {
 					$this->last_failure = $k;
 					return false;
 				}
@@ -307,6 +310,7 @@ class Validation {
 				$this->last_failure = $k;
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->_allowed_values_nc_lowercased) {
 			$k = 'allowed_values_nc';
@@ -317,7 +321,8 @@ class Validation {
 				}
 			}
 			elseif (is_scalar($value)) {
-				if (!in_array($value, $this->$k)) {
+				$strict = is_null($value) || is_bool($value) || ($value === '');
+				if (!in_array($value, $this->$k, $strict)) {
 					$this->last_failure = $k;
 					return false;
 				}
@@ -335,66 +340,77 @@ class Validation {
 				$this->last_failure = $k;
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->resource_type) {
 			if (!(is_resource($value) && (get_resource_type($value) == $this->resource_type))) {
 				$this->last_failure = 'resource_type';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->max_length)) {
 			if (!(is_scalar($value) && (strlen($value) <= $this->max_length))) {
 				$this->last_failure = 'max_length';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->min_length)) {
 			if (!(is_scalar($value) && (strlen($value) >= $this->min_length))) {
 				$this->last_failure = 'min_length';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->mb_max_length)) {
 			if (!(is_scalar($value) && (mb_strlen($value) <= $this->mb_max_length))) {
 				$this->last_failure = 'mb_max_length';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->mb_min_length)) {
 			if (!(is_scalar($value) && (mb_strlen($value) >= $this->mb_min_length))) {
 				$this->last_failure = 'mb_min_length';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->max_value)) {
 			if (!(is_numeric($value) && ($value <= $this->max_value))) {
 				$this->last_failure = 'max_value';
 				return false;
 			}
+			$tests++;
 		}
 		if (!is_null($this->min_value)) {
 			if (!(is_numeric($value) && ($value >= $this->min_value))) {
 				$this->last_failure = 'min_value';
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->isa) {
 			if (!(is_object($value) && @is_a($value, $this->isa))) {
 				$this->last_failure = 'isa';
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->regex) {
 			if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? intval($value) : $value))) {
 				$this->last_failure = 'regex';
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->callback) {
 			if (!call_user_func($this->callback, $value)) {
 				$this->last_failure = 'callback';
 				return false;
 			}
+			$tests++;
 		}
 		if ($this->callbacks) {
 			foreach ($this->callbacks as $key => $callback) {
@@ -403,7 +419,15 @@ class Validation {
 					return false;
 				}
 			}
+			$tests++;
 		}
+
+		# Treat null values as invalid if no tests were performed.
+		if (!$tests && is_null($value)) {
+			$this->last_failure = 'not null';
+			return false;
+		}
+
 		$this->last_failure = null;
 		return true;
 	}
