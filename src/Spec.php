@@ -319,23 +319,17 @@ class Spec {
 						$arg = null;
 					}
 				}
-				if (is_null($arg)) { # if set to null by "before" callback...
-					# If optional or if the spec allows the NULL type, then continue
-					if ($this->optional) {
-						# null allowed
-					}
-					elseif ($this->validation && $this->validation->validate($arg)) {
-						# null is one of the allowed 'types' or 'allowed_values' of the Validation, so allow it.
-					}
-					else {
-						$this->last_failure = 'mandatory (set to null by before callback)';
-						return false;
-					}
-				}
 			}
 
 			if (is_null($arg)) {
-				if (!$this->optional) {
+				# If optional or if the spec allows the NULL type (which is a bit bizarre), then continue
+				if ($this->optional) {
+					# null allowed
+				}
+				#elseif ($this->validation && $this->validation->validate($arg)) {	# if enabling this, then also allow null values in Validation->validate()
+				#	# null is one of the allowed 'types' or 'allowed_values' of the Validation, so allow it.
+				#}
+				else {
 					$this->last_failure = 'mandatory';
 					return false;
 				}
