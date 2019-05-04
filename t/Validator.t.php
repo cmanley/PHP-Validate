@@ -1,12 +1,13 @@
 <?php
+namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
 	print 'phpunit ' . $argv[0] . "\n";
-	class PHPUnit_Framework_TestCase {}
+	class TestCase {}
 }
 
 
-class Test extends PHPUnit_Framework_TestCase {
+class T extends TestCase {
 
 	const CLASS_NAME = 'Validate\\Validator';
 	const FILE_NAME = '../src/Validator.php';
@@ -105,7 +106,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'min_value'	=> 0,
 			),
 		);
-		$validator = new Validate\Validator(array(
+		$validator = new \Validate\Validator(array(
 			'allow_extra'	=> false,
 			'delete_null'	=> true,
 			'null_empty_strings'	=> true,
@@ -159,7 +160,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			try {
 				$validated_input = $validator->validate($input);
 			}
-			catch (Validate\Exception\ValidationException $e) {
+			catch (\Validate\Exception\ValidationException $e) {
 				$got_exception = $e->getMessage();
 			}
 			$this->assertEquals($expect, $validated_input, "Test $i validate() returns expected result.");
@@ -332,7 +333,7 @@ class Test extends PHPUnit_Framework_TestCase {
 		foreach ($tests as $name => $test) {
 			$args = $test['options'];
 			$args['specs'] = $specs;
-			$validator = new Validate\Validator($args);
+			$validator = new \Validate\Validator($args);
 			foreach ($inputs as $input_name => $input) {
 				$expect	= $test['expects'][$input_name]['expect'];
 				$expect_exception = $test['expects'][$input_name]['expect_exception'];
@@ -341,7 +342,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				try {
 					$validated_input = $validator->validate_pos($input);
 				}
-				catch (Validate\Exception\ValidationException $e) {
+				catch (\Validate\Exception\ValidationException $e) {
 					$got_exception = $e->getMessage();
 				}
 				$this->assertEquals($expect, $validated_input, "Test \"$name\"->\"$input_name\" validate() returns expected result.");
@@ -355,5 +356,5 @@ class Test extends PHPUnit_Framework_TestCase {
 
 
 if (isset($argv)) {
-	require_once(Test::FILE_NAME);
+	require_once(T::FILE_NAME);
 }

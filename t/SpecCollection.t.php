@@ -1,12 +1,13 @@
 <?php
+namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
 	print 'phpunit ' . $argv[0] . "\n";
-	class PHPUnit_Framework_TestCase {}
+	class TestCase {}
 }
 
 
-class Test extends PHPUnit_Framework_TestCase {
+class T extends TestCase {
 
 	const CLASS_NAME = 'Validate\\SpecCollection';
 	const FILE_NAME = '../src/SpecCollection.php';
@@ -131,7 +132,7 @@ class Test extends PHPUnit_Framework_TestCase {
 				'expect'	=> true,
 			),
 		);
-		$specs = new Validate\SpecCollection(array(
+		$specs = new \Validate\SpecCollection(array(
 			'firstname'	=> array(
 				'description'	=> 'First name',
 				'mb_max_length'	=> 10,
@@ -166,7 +167,7 @@ class Test extends PHPUnit_Framework_TestCase {
 
 
 if (isset($argv)) {
-	require_once(__DIR__ . '/' . Test::FILE_NAME);
+	require_once(__DIR__ . '/' . T::FILE_NAME);
 	if (1) {
 		$tests = array(
 			array(
@@ -219,7 +220,7 @@ if (isset($argv)) {
 				'expect'	=> true,
 			),
 		);
-		$specs = new Validate\SpecCollection(array(
+		$specs = new \Validate\SpecCollection(array(
 			'firstname'	=> array(
 				'description'	=> 'First name',
 				'mb_max_length'	=> 10,

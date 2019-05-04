@@ -1,12 +1,13 @@
 <?php
+namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
 	print 'phpunit ' . $argv[0] . "\n";
-	class PHPUnit_Framework_TestCase {}
+	class TestCase {}
 }
 
 
-class Test extends PHPUnit_Framework_TestCase {
+class T extends TestCase {
 
 	const CLASS_NAME = 'Validate\\Validation';
 	const FILE_NAME = '../src/Validation.php';
@@ -67,7 +68,7 @@ class Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testValidate() {
-		$validation = new Validate\Validation(array(
+		$validation = new \Validate\Validation(array(
 			'callbacks'		=> array(
 				'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
 			),

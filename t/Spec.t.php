@@ -1,12 +1,13 @@
 <?php
+namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
 	print 'phpunit ' . $argv[0] . "\n";
-	class PHPUnit_Framework_TestCase {}
+	class TestCase {}
 }
 
 
-class Test extends PHPUnit_Framework_TestCase {
+class T extends TestCase {
 
 	const CLASS_NAME = 'Validate\\Spec';
 	const FILE_NAME = '../src/Spec.php';
@@ -58,7 +59,7 @@ class Test extends PHPUnit_Framework_TestCase {
 			'default'		=> 'nobody@home.com',
 			'description'	=> 'Email address',
 			'optional'		=> true,
-			'validation'	=> new Validate\Validation(array(
+			'validation'	=> new \Validate\Validation(array(
 				'type'			=> 'string',
 				'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 				'mb_max_length'	=> 50,
@@ -70,12 +71,12 @@ class Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testValidate() {
-		$spec = new Validate\Spec(array(
+		$spec = new \Validate\Spec(array(
 			'allow_empty'	=> false,
 			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
 			'description'	=> 'Email address',
-			'validation'	=> new Validate\Validation(array(
+			'validation'	=> new \Validate\Validation(array(
 				'type'			=> 'string',
 				'callbacks'		=> array(
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
@@ -126,12 +127,12 @@ class Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testValidateWithDefault() {
-		$spec = new Validate\Spec(array(
+		$spec = new \Validate\Spec(array(
 			'allow_empty'	=> false,
 			'after'			=> function(&$x) { $x = mb_strtolower($x); },
 			'description'	=> 'Email address',
 			'default'		=> 'nobody',	# defaults aren't validated as they are trusted values
-			'validation'	=> new Validate\Validation(array(
+			'validation'	=> new \Validate\Validation(array(
 				'type'			=> 'string',
 				'callbacks'		=> array(
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
@@ -170,21 +171,21 @@ class Test extends PHPUnit_Framework_TestCase {
 
 	public function testReturnValuesBeforeAfter() {
 		foreach (array('before', 'after') as $when) {
-			$spec = new Validate\Spec(array(
+			$spec = new \Validate\Spec(array(
 				$when			=> function(&$x) {},	# void (null) result
 			));
 			$input = 'anything';
 			$this->assertTrue($spec->validate($input), "Using callback '$when' with void return value validates as true.");
 			$this->assertEquals(null, $spec->getLastFailure(), 'Check last failure');
 
-			$spec = new Validate\Spec(array(
+			$spec = new \Validate\Spec(array(
 				$when			=> function(&$x) { return false; },
 			));
 			$input = 'anything';
 			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as FALSE.");
 			$this->assertEquals("callback $when", $spec->getLastFailure(), 'Check last failure');
 
-			$spec = new Validate\Spec(array(
+			$spec = new \Validate\Spec(array(
 				$when			=> function(&$x) { $x = strtoupper($x); return true; },
 			));
 			$input = 'anything';
@@ -198,14 +199,14 @@ class Test extends PHPUnit_Framework_TestCase {
 
 
 if (isset($argv)) {
-	require_once(__DIR__ . '/' . Test::FILE_NAME);
+	require_once(__DIR__ . '/' . T::FILE_NAME);
 	if (1) {
-		$spec = new Validate\Spec(array(
+		$spec = new \Validate\Spec(array(
 			'allow_empty'	=> false,
 			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
 			'description'	=> 'Email address',
-			'validation'	=> new Validate\Validation(array(
+			'validation'	=> new \Validate\Validation(array(
 				'type'			=> 'string',
 				'callbacks'		=> array(
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
