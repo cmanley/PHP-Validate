@@ -232,6 +232,7 @@ class Validator {
 				}
 			}
 		}
+
 		# Trim string values if so requested
 		if ($this->trim) {
 			foreach ($args as $k => &$v) {
@@ -241,6 +242,7 @@ class Validator {
 				unset($v);
 			}
 		}
+
 		# Replace empty string values with null if so requested
 		if ($this->null_empty_strings) {
 			foreach ($args as $k => &$v) {
@@ -250,10 +252,11 @@ class Validator {
 				unset($v);
 			}
 		}
+
 		# Remove key value pairs having null values if so requested
 		if ($this->delete_null) {
 			foreach ($args as $k => $v) {
-				if (is_null($v) || (is_string($v) && !strlen($v))) {
+				if (is_null($v)) {
 					if (!($specs && $specs->offsetExists($k) && !is_null($specs[$k]->default))) { # don't delete args that have default values in their Spec.
 						unset($args[$k]);
 					}
@@ -289,8 +292,15 @@ class Validator {
 			if (!$spec->validate($v)) { # also applies defaults or before/after mutators to $v reference
 				throw new NamedValueException($this->prefix . $k, $spec->getLastFailure(), $v);
 			}
+
+			# Remove key value pairs having null values if so requested after application of before/after mutators
+			if ($this->delete_null && is_null($v)) {
+				unset($args[$k]);
+			}
+
 			unset($v);
 		}
+
 		return $args; # same as input if no before/after mutators were called
 	}
 
