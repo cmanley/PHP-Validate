@@ -18,41 +18,41 @@ Download or checkout from git, or install the packagist package cmanley/validate
 **Example of function associative array parameter validation:**
 ```php
 <?php
-require_once('/path/to/Validate/Validator.php'); // or use composer autoloader
+require_once('/path/to/Validate/Validator.php'); # or use composer autoloader
 
 function save_student_score(array $params) {
-	// Create the validator object. By using static, it is only created once and persists for all function calls.
-	static $validator = new \Validate\Validator(array(
-		'trim' => true, // trim all string values
-		'null_empty_strings' => true, // convert empty string values to null
-		'specs' => array(
-			'name'	=> array(
+	# Create the validator object. By using static, it is only created once and persists for all function calls.
+	$validator = new \Validate\Validator([
+		'trim' => true, # trim all string values
+		'null_empty_strings' => true, # convert empty string values to null
+		'specs' => [
+			'name'	=> [
 				'type' => 'string',
 				'mb_max_length'	=> 2,
 				'mb_max_length'	=> 30,
-			),
-			'birthdate' => array(
+			],
+			'birthdate' => [
 				'type'  => 'string',
-				'regex' => '#^[0-3]\d/[01]\d/\d{4}$#', // expect dd/mm/yyyy
-				'after' => function(&$value) { // want yyyy-mm-dd
+				'regex' => '#^[0-3]\d/[01]\d/\d{4}$#', # expect dd/mm/yyyy
+				'after' => function(&$value) { # want yyyy-mm-dd
 					if (is_string($value) && preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $value, $matches)) {
 						$value = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
 					}
 				},
 				'optional' => true,
-			),
-			'score' => array(
-				'types'     => array('float', 'integer'),
+			],
+			'score' => [
+				'types'     => ['float', 'integer'],
 				'max_value' => 10,
 				'min_value' => 0,
-			),
-		),
-	));
+			],
+		],
+	]);
 
-	// Actually validate the parameters. This will throw an exception in invalid parameters are found.
+	# Actually validate the parameters. This will throw an exception in invalid parameters are found.
 	$params = $validator->validate($params);
 
-	// Insert $params into database here.
+	# Insert $params into database here.
 
 }
 	
@@ -64,10 +64,10 @@ catch (Validate\Exception\ValidationException $e) {
 	$error = $e->getMessage();
 }
 if ($error) {
-	// display error message.
+	# display error message.
 }
 else {
-	// display success message.
+	# display success message.
 }
 ```
 
