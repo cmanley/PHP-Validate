@@ -6,7 +6,7 @@ Inspired by [Params::Validate](http://search.cpan.org/perldoc/Params::Validate) 
 You can use it to validate almost anything, but typically it can be used for (strictly) validating input from HTML forms, fields while reading CSV files, function parameters, etc.
 
 ### Requirements
-*  PHP 5.3 or newer
+*  PHP 5.4 or later
 
 ### Installation
 Download or checkout from git, or install the packagist package cmanley/validate.
