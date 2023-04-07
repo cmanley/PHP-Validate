@@ -188,7 +188,7 @@ class Spec {
 	/**
 	* Returns the value of the 'allow_empty' option as passed into the constructor.
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function allow_empty() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -221,7 +221,7 @@ class Spec {
 	/**
 	* Return the before option as passed in the constructor.
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function before() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -232,7 +232,7 @@ class Spec {
 	/**
 	* Return the after option as passed in the constructor.
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function after() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -243,7 +243,7 @@ class Spec {
 	/**
 	* Returns the value of the 'optional' option as passed into the constructor.
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function optional() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -254,7 +254,7 @@ class Spec {
 	/**
 	* Returns the value of the 'trim' option as passed into the constructor.
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function trim() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -289,7 +289,7 @@ class Spec {
 	* then these are applied to the argument in order to modify it in place, which is why it is passed by reference.
 	*
 	* @param mixed &$arg
-	* @return boolean
+	* @return bool
 	*/
 	public function validate(&$arg) {
 		if (is_string($arg)) {

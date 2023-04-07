@@ -48,7 +48,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* Returns a Spec object for the given boolean value.
 	* This is used internally when assigning boolean values instead of Spec objects.
 	*
-	* @param boolean $value
+	* @param bool $value
 	* @throws InvalidArgumentException
 	*/
 	private static function _booleanToSpec($value) {
@@ -121,7 +121,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Implements ArrayAccess
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function offsetExists($offset) {
 		return array_key_exists($offset, $this->pairs);
@@ -140,7 +140,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Implements ArrayAccess
 	*
-	* @return boolean
+	* @return bool
 	*/
 	public function offsetGet($offset) {
 		return array_key_exists($offset, $this->pairs) ? $this->pairs[$offset] : null;

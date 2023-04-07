@@ -266,7 +266,7 @@ class Validation {
 	* If the result is false, then you can call getLastFailure() to get the name of the test that validation failed on.
 	*
 	* @param mixed $value
-	* @return boolean
+	* @return bool
 	*/
 	public function validate($value) {
 		if (is_null($value)) {	# the caller (typically Spec) should not call this method with null values
