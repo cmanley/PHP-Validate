@@ -55,12 +55,12 @@ function save_student_score(array $params) {
 	# Insert $params into database here.
 
 }
-	
+
 $error = null;
 try {
 	save_student_score($_POST);
 }
-catch (Validate\Exception\ValidationException $e) {
+catch (\Validate\Exception\ValidationException $e) {
 	$error = $e->getMessage();
 }
 if ($error) {

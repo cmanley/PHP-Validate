@@ -88,7 +88,7 @@ class Spec {
 	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.
 	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
 	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
-	*	default		: Any non-null value (even closures!); null arguments to validate() are replaced with this (or it's result in if it's a closure)
+	*	default		: Any non-null value; null arguments to validate() are replaced with this
 	*	optional	: boolean, if true, then null values are allowed
 	*	trim		: boolean, if true, then whitespace is trimmed off both ends of string values before validation.
 	*	description	: Optional description that can be used by user code.
@@ -302,7 +302,8 @@ class Spec {
 		}
 
 		if (is_null($arg) && !is_null($this->default)) {
-			$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;
+			#$arg = is_object($this->default) && ($this->default instanceof \Closure) ? call_user_func($this->default) : $this->default;	# old behavior didn't allow default to be an actual closure
+			$arg = $this->default;
 		}
 		else {
 			if (!is_null($arg) && $this->before) {
