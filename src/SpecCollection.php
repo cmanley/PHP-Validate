@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validate\SpecCollection class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate;
@@ -32,10 +32,10 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* If boolean values are given, then these are converted into a Spec object with optional => !boolean.
 	* If array values are given, then these are passed as arguments into the constructor of a new Spec object.
 	*
-	* @param array associative array of field name => Spec|boolean|array pairs
+	* @param array associative array of field name => Spec|bool|array pairs
 	* @throws InvalidArgumentException
 	*/
-	public function __construct(array $pairs = array()) {
+	public function __construct(array $pairs = []) {
 		foreach ($pairs as $key => &$value) {
 			static::_checkKeyValuePair($key, $value);
 			unset($value);
@@ -51,12 +51,12 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* @param bool $value
 	* @throws InvalidArgumentException
 	*/
-	private static function _booleanToSpec($value) {
-		$property = 'boolean_spec_' . var_export((boolean)$value, true);
+	private static function _boolToSpec(bool $value): Spec {
+		$property = 'boolean_spec_' . var_export((bool)$value, true);
 		if (!static::$$property) {
-			static::$$property = (new Spec(array(
+			static::$$property = (new Spec([
 				'optional' => !$value,
-			)));
+			]));
 		}
 		return static::$$property;
 	}
@@ -69,7 +69,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* @param mixed &$value
 	* @throws InvalidArgumentException
 	*/
-	private static function _checkKeyValuePair($key, &$value) {
+	private static function _checkKeyValuePair($key, &$value): void {
 		if (!((is_string($key) && strlen($key)) || is_int($key))) {
 			throw new \InvalidArgumentException('Only string or int keys are allowed');
 		}
@@ -78,7 +78,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 				$value = new Spec($value);
 			}
 			elseif (is_bool($value) || is_int($value)) {
-				$value = static::_booleanToSpec($value);
+				$value = static::_boolToSpec((bool)$value);
 			}
 			else {
 				throw new \InvalidArgumentException('Array values must be NULL or boolean or array or an instance of Spec. Got ' . gettype($value) . " for $key");
@@ -91,9 +91,9 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	* Return count of items in collection.
 	* Implements countable
 	*
-	* @return integer
+	* @return int
 	*/
-	public function count() {
+	public function count(): int {
 		return count($this->pairs);
 	}
 
@@ -103,7 +103,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	*
 	* @return ArrayIterator
 	*/
-	public function getIterator() {
+	public function getIterator(): \ArrayIterator {
 		return new \ArrayIterator($this->pairs);	# Uses a copy of pairs; the caller can't mutate this.
 	}
 
@@ -111,7 +111,8 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Implements ArrayAccess
 	*/
-	public function offsetSet($offset, $value) {
+	#public function offsetSet(mixed $offset, mixed $value): void {	# PHP8
+	public function offsetSet($offset, $value): void {
 		throw new \BadMethodCallException("Attempt to set value of key \"$offset\" on immutable instance of " . get_class($this));
 		#static::_checkKeyValuePair($offset, $value);
 		#$this->pairs[$offset] = $value;
@@ -123,7 +124,8 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	*
 	* @return bool
 	*/
-	public function offsetExists($offset) {
+	#public function offsetExists(mixed $offset): bool {	# PHP8
+	public function offsetExists($offset): bool {
 		return array_key_exists($offset, $this->pairs);
 	}
 
@@ -131,7 +133,8 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Implements ArrayAccess
 	*/
-	public function offsetUnset($offset) {
+	#public offsetUnset(mixed $offset): void {	# PHP8
+	public function offsetUnset($offset): void {
 		throw new \BadMethodCallException("Attempt to unset key \"$offset\" on immutable instance of " . get_class($this));
 		#unset($this->pairs[$offset]);
 	}
@@ -140,8 +143,10 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	/**
 	* Implements ArrayAccess
 	*
-	* @return bool
+	* @return mixed
 	*/
+	#[\ReturnTypeWillChange]
+	#public function offsetGet(mixed $offset): mixed {	# PHP8
 	public function offsetGet($offset) {
 		return array_key_exists($offset, $this->pairs) ? $this->pairs[$offset] : null;
 	}
@@ -152,7 +157,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	*
 	* @return array
 	*/
-	public function toArray() {
+	public function toArray(): array {
 		return $this->pairs;
 	}
 
@@ -162,7 +167,7 @@ class SpecCollection implements \Countable, \IteratorAggregate, \ArrayAccess {
 	*
 	* @return array
 	*/
-	public function keys() {
+	public function keys(): array {
 		return array_keys($this->pairs);
 	}
 

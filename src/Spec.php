@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Spec class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate;
@@ -85,12 +85,12 @@ class Spec {
 	*
 	* The following options are supported:
 	* <pre>
-	*	allow_empty	: boolean, allow empty strings to be validated and pass 'optional' check.
+	*	allow_empty	: bool, allow empty strings to be validated and pass 'optional' check.
 	*	before		: Callback that takes a reference to the value as argument so that it can mutate it before validation. It may trigger validation failure by returning boolean false.
 	*	after		: Callback that takes a reference to the value as argument so that it can mutate it after validation.  It may trigger validation failure by returning boolean false.
 	*	default		: Any non-null value; null arguments to validate() are replaced with this
-	*	optional	: boolean, if true, then null values are allowed
-	*	trim		: boolean, if true, then whitespace is trimmed off both ends of string values before validation.
+	*	optional	: bool, if true, then null values are allowed
+	*	trim		: bool, if true, then whitespace is trimmed off both ends of string values before validation.
 	*	description	: Optional description that can be used by user code.
 	*	validation	: Validation (constraints) object used to validate non-null values.
 	* </pre>
@@ -103,7 +103,7 @@ class Spec {
 	public function __construct(array $args = null) {
 		if ($args) {
 			$boolean_options = array('allow_empty', 'optional', 'trim');
-			$unknown_args = array();
+			$unknown_args = [];
 			foreach ($args as $key => $value) {
 				if ($key == 'validation') {
 					if (!is_null($value)) {
@@ -137,7 +137,7 @@ class Spec {
 				}
 				# Process boolean options
 				elseif (in_array($key, $boolean_options)) {
-					$this->$key = (boolean) $value;
+					$this->$key = (bool) $value;
 				}
 
 				elseif (substr($key,0,1) === '_') {
@@ -167,12 +167,13 @@ class Spec {
 	*
 	* @throws \BadMethodCallException
 	*/
-	public function __get($key) {
+	#public __get(string $name): mixed {	# PHP8
+	public function __get(string $name) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
-			$p = $r->getProperty($key);
+			$p = $r->getProperty($name);
 		}
 		catch (\ReflectionException $e) {
 			# snuff unknown properties with exception message 'Property x does not exist'
@@ -181,7 +182,7 @@ class Spec {
 			$p->setAccessible(true); # Allow access to non-public members.
 			return $p->getValue($this);
 		}
-		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
+		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $name);
 	}
 
 
@@ -190,7 +191,7 @@ class Spec {
 	*
 	* @return bool
 	*/
-	public function allow_empty() {
+	public function allow_empty(): bool {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->allow_empty;
 	}
@@ -199,7 +200,7 @@ class Spec {
 	/**
 	* Returns the value of the 'default' option as passed into the constructor.
 	*
-	* @return string|null
+	* @return mixed
 	*/
 	public function getDefault() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -212,7 +213,7 @@ class Spec {
 	*
 	* @return string|null
 	*/
-	public function description() {
+	public function description(): ?string {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
 		return $this->description;
 	}
@@ -221,7 +222,7 @@ class Spec {
 	/**
 	* Return the before option as passed in the constructor.
 	*
-	* @return bool
+	* @return Callable
 	*/
 	public function before() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -232,7 +233,7 @@ class Spec {
 	/**
 	* Return the after option as passed in the constructor.
 	*
-	* @return bool
+	* @return Callable
 	*/
 	public function after() {
 		trigger_error('Method ' . __METHOD__ . ' is deprecated; read the ' . __FUNCTION__ . ' property instead', E_USER_DEPRECATED);
@@ -278,7 +279,7 @@ class Spec {
 	*
 	* @return string|null
 	*/
-	public function getLastFailure() {
+	public function getLastFailure(): ?string {
 		return $this->last_failure;
 	}
 
@@ -291,7 +292,7 @@ class Spec {
 	* @param mixed &$arg
 	* @return bool
 	*/
-	public function validate(&$arg) {
+	public function validate(&$arg): bool {
 		if (is_string($arg)) {
 			if ($this->trim) {
 				$arg = trim($arg);	# trim is multibyte safe
@@ -364,7 +365,7 @@ class Spec {
 	* @param mixed &$arg
 	* @throws Validate\Exception\ValueException
 	*/
-	public function validate_ex(&$arg) {
+	public function validate_ex(&$arg): void {
 		if (!$this->validate($arg)) {
 			throw new ValueException($this->getLastFailure(), $arg);
 		}

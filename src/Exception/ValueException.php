@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validate\Exception\ValueException class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2018, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2018-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate\Exception;
@@ -29,9 +29,8 @@ class ValueException extends ValidationException {
 	* @param string $check name of check that failed
 	* @param mixed $value the value that isn't valid
 	* @param string $message optional custom message
-	* @param array $options
 	*/
-	public function __construct($check, $value, $message = null) {
+	public function __construct(string $check, $value, string $message = null) {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
@@ -49,7 +48,7 @@ class ValueException extends ValidationException {
 	*
 	* @return string
 	*/
-	public function getCheck() {
+	public function getCheck(): string {
 		return $this->check;
 	}
 
@@ -60,7 +59,7 @@ class ValueException extends ValidationException {
 	*
 	* @return string|null
 	*/
-	public function getStringPlaceholderValue() {
+	public function getStringPlaceholderValue(): ?string {
 		if (is_scalar($this->value)) {
 			if (is_bool($this->value)) {
 				return $this->value ? 'true' : 'false';
@@ -91,7 +90,7 @@ class ValueException extends ValidationException {
 	*
 	* @return string
 	*/
-	public function getValueSimple() {
+	public function getValueSimple(): string {
 		if (is_bool($this->value)) {
 			return $this->value ? 'true' : 'false';
 		}

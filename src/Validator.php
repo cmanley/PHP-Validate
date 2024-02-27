@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validator class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate;
@@ -147,7 +147,7 @@ class Validator {
 				}
 				# Process boolean options
 				elseif (in_array($k, $boolean_options)) {
-					$this->$k = (boolean) $v;
+					$this->$k = (bool) $v;
 				}
 				elseif (substr($k,0,1) === '_') {
 					# Silently ignore options prefixed with underscore.
@@ -175,12 +175,13 @@ class Validator {
 	*
 	* @throws \BadMethodCallException
 	*/
-	public function __get($key) {
+	#public __get(string $name): mixed {	# PHP8
+	public function __get(string $name) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
-			$p = $r->getProperty($key);
+			$p = $r->getProperty($name);
 		}
 		catch (\ReflectionException $e) {
 			# snuff unknown properties with exception message 'Property x does not exist'
@@ -189,7 +190,7 @@ class Validator {
 			$p->setAccessible(true); # Allow access to non-public members.
 			return $p->getValue($this);
 		}
-		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
+		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $name);
 	}
 
 
@@ -198,7 +199,7 @@ class Validator {
 	*
 	* @return SpecCollection|null
 	*/
-	public function specs() {
+	public function specs(): ?SpecCollection {
 		return $this->specs;
 	}
 
@@ -212,10 +213,10 @@ class Validator {
 	* @throws Validate\Exception\ValidationException
 	* @throws Validate\Exception\NamedValueException
 	*/
-	public function validate(array $args) {
+	public function validate(array $args): array {
 		if (!is_array($args)) {
 			if (empty($args)) {
-				$args = array();	# be silently tolerant of null and false values. PHP will have emitted a E_RECOVERABLE_ERROR warning anyway.
+				$args = [];	# be silently tolerant of null and false values. PHP will have emitted a E_RECOVERABLE_ERROR warning anyway.
 			}
 			else {
 				throw new \InvalidArgumentException(__METHOD__ . ' requires an array argument but was given a ' . gettype($args) . ' instead');
@@ -316,7 +317,7 @@ class Validator {
 	* @throws Validate\Exception\ValidationException
 	* @throws Validate\Exception\NamedValueException
 	*/
-	public function validate_pos(array $args) {
+	public function validate_pos(array $args): array {
 		$args = array_values($args); # this make sure that args is a sequential numerically indexed array.
 		$specs = $this->specs();
 		if ($specs) {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
@@ -15,7 +15,7 @@ class T extends TestCase {
     public function testRequire() {
     	$file = __DIR__ . '/' . static::FILE_NAME;
 		$this->assertFileExists($file);
-		$this->assertTrue((boolean) include $file, 'Check include result');
+		$this->assertTrue((bool) include $file, 'Check include result');
     }
 
     public function testClassExists() {
@@ -164,7 +164,7 @@ class T extends TestCase {
 			$expect_last_failure	= $test['expect_last_failure'];
 			$copy_of_input = $input;
 			$this->assertEquals($expect, $spec->validate($copy_of_input), "validate(\"$input\") returns expected result.");
-			$this->assertTrue(strlen($input) || ($copy_of_input === $spec->default), 'Default value is applied only when input is null.');
+			$this->assertTrue((isset($input) && strlen($input)) || ($copy_of_input === $spec->default), 'Default value is applied only when input is null.');
 			$this->assertEquals($expect_last_failure, $spec->getLastFailure(), "getLastFailure() returns expected result for \"$input\".");
 		}
 	}

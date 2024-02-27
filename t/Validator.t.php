@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
@@ -15,7 +15,7 @@ class T extends TestCase {
     public function testRequire() {
     	$file = __DIR__ . '/' . static::FILE_NAME;
 		$this->assertFileExists($file);
-		$this->assertTrue((boolean) include $file, 'Check include result');
+		$this->assertTrue((bool) include $file, 'Check include result');
     }
 
     public function testClassExists() {
@@ -191,11 +191,11 @@ class T extends TestCase {
 			'too few params'	=> array('Jane'),
 			'too many params'	=> array('Jane', 7, '', 'bla'),
 			'invalid 2nd param (index 1)' => array('Mike', 'high'),
-			'no params'			=> array(),
+			'no params'			=> [],
 		);
 		$tests = array(
 			'no options' => array(
-				'options' => array(),
+				'options' => [],
 				'expects' => array(
 					'normal'	=> array(
 						'expect'			=> array('JANE', 7),

@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validation class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2016, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2016-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate;
@@ -194,7 +194,7 @@ class Validation {
 				# Deprecated option(s)
 				elseif ($key == 'nocase') {
 					trigger_error('Option "nocase" is deprecated; use "allowed_values_nc" instead', E_USER_DEPRECATED);
-					$this->$key = (boolean) $value;
+					$this->$key = (bool) $value;
 				}
 				else {
 					throw new \InvalidArgumentException("Unknown argument \"$key\".");
@@ -233,12 +233,13 @@ class Validation {
 	*
 	* @throws \BadMethodCallException
 	*/
-	public function __get($key) {
+	#public __get(string $name): mixed {	# PHP8
+	public function __get(string $name) {
 		# TODO: perhaps replace this reflection code with some simple hash access code. See the comments below why.
 		$r = new \ReflectionObject($this);
 		$p = null;
 		try {
-			$p = $r->getProperty($key);
+			$p = $r->getProperty($name);
 		}
 		catch (\ReflectionException $e) {
 			# snuff unknown properties with exception message 'Property x does not exist'
@@ -247,16 +248,16 @@ class Validation {
 			$p->setAccessible(true); # Allow access to non-public members.
 			return $p->getValue($this); # This design breaks mirrors. Surely the reflection property should know what object was given to ReflectionObject.
 		}
-		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $key);
+		throw new \BadMethodCallException('Attempt to read undefined property ' . get_class($this) . '->' . $name);
 	}
 
 
 	/**
 	* Return the name of the check the last validation failed on.
 	*
-	* @return string
+	* @return string|null
 	*/
-	public function getLastFailure() {
+	public function getLastFailure(): ?string {
 		return $this->last_failure;
 	}
 
@@ -268,7 +269,7 @@ class Validation {
 	* @param mixed $value
 	* @return bool
 	*/
-	public function validate($value) {
+	public function validate($value): bool {
 		if (is_null($value)) {	# the caller (typically Spec) should not call this method with null values
 			trigger_error('NULL values are not supported by ' . __METHOD__ . ', returning true', E_USER_WARNING);
 			$this->last_failure = null;
@@ -350,28 +351,28 @@ class Validation {
 			$tests++;
 		}
 		if (!is_null($this->max_length)) {
-			if (!(is_scalar($value) && (strlen($value) <= $this->max_length))) {
+			if (!(is_scalar($value) && (strlen((string)$value) <= $this->max_length))) {
 				$this->last_failure = 'max_length';
 				return false;
 			}
 			$tests++;
 		}
 		if (!is_null($this->min_length)) {
-			if (!(is_scalar($value) && (strlen($value) >= $this->min_length))) {
+			if (!(is_scalar($value) && (strlen((string)$value) >= $this->min_length))) {
 				$this->last_failure = 'min_length';
 				return false;
 			}
 			$tests++;
 		}
 		if (!is_null($this->mb_max_length)) {
-			if (!(is_scalar($value) && (mb_strlen($value) <= $this->mb_max_length))) {
+			if (!(is_scalar($value) && (mb_strlen((string)$value) <= $this->mb_max_length))) {
 				$this->last_failure = 'mb_max_length';
 				return false;
 			}
 			$tests++;
 		}
 		if (!is_null($this->mb_min_length)) {
-			if (!(is_scalar($value) && (mb_strlen($value) >= $this->mb_min_length))) {
+			if (!(is_scalar($value) && (mb_strlen((string)$value) >= $this->mb_min_length))) {
 				$this->last_failure = 'mb_min_length';
 				return false;
 			}
@@ -399,7 +400,7 @@ class Validation {
 			$tests++;
 		}
 		if ($this->regex) {
-			if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? intval($value) : $value))) {
+			if (!(is_scalar($value) && preg_match($this->regex, is_bool($value) ? (string)intval($value) : (string)$value))) {
 				$this->last_failure = 'regex';
 				return false;
 			}
@@ -440,7 +441,7 @@ class Validation {
 	* @param mixed $value
 	* @throws Validate\Exception\ValueException
 	*/
-	public function validate_ex($value) {
+	public function validate_ex($value): void {
 		if (!is_null($value)) {
 			if (!$this->validate($value)) {
 				throw new ValueException($this->getLastFailure(), $value);

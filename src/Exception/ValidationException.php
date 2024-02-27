@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validate\Exception\ValidationException class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2018, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2018-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate\Exception;

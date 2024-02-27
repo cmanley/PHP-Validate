@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace PHPUnit\Framework;
 if (isset($argv)) {
 	print "Usage:\n";
 	print 'phpunit ' . $argv[0] . "\n";
 	class TestCase {}
 }
+error_reporting(error_reporting() | E_DEPRECATED);
 
 
 class T extends TestCase {
@@ -15,7 +16,7 @@ class T extends TestCase {
     public function testRequire() {
     	$file = __DIR__ . '/' . static::FILE_NAME;
 		$this->assertFileExists($file);
-		$this->assertTrue((boolean) include $file, 'Check include result');
+		$this->assertTrue((bool) include $file, 'Check include result');
     }
 
     public function testClassExists() {

@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 /**
 * Contains the Validate\Exception\NamedValueException class.
 *
 * @author    Craig Manley
-* @copyright Copyright © 2018, Craig Manley (www.craigmanley.com)
+* @copyright Copyright © 2018-2024, Craig Manley (www.craigmanley.com)
 * @license   http://www.opensource.org/licenses/mit-license.php Licensed under MIT
 */
 namespace Validate\Exception;
@@ -31,9 +31,8 @@ class NamedValueException extends ValueException {
 	* @param string $check name of check that failed
 	* @param mixed $value the value that isn't valid
 	* @param string $message optional custom message
-	* @param array $options
 	*/
-	public function __construct($name, $check, $value, $message = null) {
+	public function __construct(string $name, string $check, $value, string $message = null) {
 		$this->name  = $name;
 		$this->check = $check;
 		$this->value = $value;
@@ -52,7 +51,7 @@ class NamedValueException extends ValueException {
 	*
 	* @return string|null
 	*/
-	public function getName() {
+	public function getName(): ?string {
 		return $this->name;
 	}
 }
