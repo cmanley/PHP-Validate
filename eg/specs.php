@@ -112,7 +112,7 @@ $tests = array(
 		'expect'	=> false,
 	),
 	'Test 4' => array(
-		'input'		=> array(),
+		'input'		=> [],
 		'expect'	=> false,
 	),
 	'Test 5' => array(

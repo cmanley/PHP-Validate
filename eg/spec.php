@@ -8,7 +8,7 @@
 require_once(__DIR__ . '/../src/Spec.php');
 
 # A Spec object can be created in 3 possible ways, all having the same effect.
-$specs = array();
+$specs = [];
 
 
 # This is the proper way to create a Spec object with it's embedded Validation object.
