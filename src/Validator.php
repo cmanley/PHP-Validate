@@ -119,13 +119,13 @@ class Validator {
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
-			$boolean_options = array(
+			$boolean_options = [
 				'allow_extra',
 				'remove_extra',
 				'null_empty_strings',
 				'delete_null',
 				'trim',
-			);
+			];
 			foreach ($args as $k => $v) {
 				if (is_null($v)) {
 					continue;

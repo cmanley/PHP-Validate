@@ -26,14 +26,14 @@ class T extends TestCase {
 
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
-		$methods = array(
+		$methods = [
 			# public
 			'__construct',
 			'__get',
 			'getLastFailure',
 			'validate',
 			'validate_ex',
-		);
+		];
 		foreach ($methods as $method) {
 			$this->assertTrue(method_exists($class, $method), "Check method $class::$method() exists.");
 		}
@@ -43,13 +43,13 @@ class T extends TestCase {
 		$class = static::CLASS_NAME;
 		$o = new $class();
 		$this->assertTrue(is_object($o), 'Create empty object.');
-		$o = new $class(array(
+		$o = new $class([
 			# Some of these validations contradict each other, but it's merely a test
-			'allowed_values_nc'	=> array('one@two.com', 'two@three.com'),
-			'callbacks'			=> array(	 # associative array of key => callback pairs
+			'allowed_values_nc'	=> ['one@two.com', 'two@three.com'],
+			'callbacks'			=> [	 # associative array of key => callback pairs
 				'syntax'	=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 				'mx'		=> function($x) { return true; },	# dummy check
-			),
+			],
 			'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 			'isa'			=> 'StdClass',
 			'mb_max_length'	=> 50,
@@ -60,55 +60,55 @@ class T extends TestCase {
 			'min_value'		=> 0.5,
 			'regex'			=> '/^\w+@\w+\.\w+$/',
 			'resource_type'	=> 'stream',
-			'types'			=> array('string', 'int'),
+			'types'			=> ['string', 'int'],
 			'type'			=> 'scalar',
 			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
-		));
+		]);
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
 		$this->assertEquals(50, $o->max_length, 'Read an attribute');
 	}
 
 	public function testValidate() {
-		$validation = new \Validate\Validation(array(
-			'callbacks'		=> array(
+		$validation = new \Validate\Validation([
+			'callbacks'		=> [
 				'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
-			),
+			],
 			'mb_max_length'	=> 10,
 			'regex'			=> '/a/',
 			'type'			=> 'string',
-		));
-		$tests = array(
-			array(
+		]);
+		$tests = [
+			[
 				'input'		=> 'This is too long.',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mb_max_length',
-			),
-			array(
+			],
+			[
 				'input'		=> 'this is also too long.',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mb_max_length',
-			),
-			array(
+			],
+			[
 				'input'		=> 'Yada',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'is_lc (callback)',
-			),
-			array(
+			],
+			[
 				'input'		=> 12345,
 				'expect'	=> false,
 				'expect_last_failure'	=> 'types',
-			),
-			array(
+			],
+			[
 				'input'		=> 'foofoo',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'regex',
-			),
-			array(
+			],
+			[
 				'input'		=> 'bla',
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-		);
+			],
+		];
 		foreach ($tests as $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];

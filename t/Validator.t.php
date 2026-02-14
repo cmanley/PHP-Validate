@@ -25,14 +25,14 @@ class T extends TestCase {
 
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
-		$methods = array(
+		$methods = [
 			# public
 			'__construct',
 			'__get',
 			'specs',
 			'validate',
 			'validate_pos',
-		);
+		];
 		foreach ($methods as $method) {
 			$this->assertTrue(method_exists($class, $method), "Check method $class::$method() exists.");
 		}
@@ -43,13 +43,13 @@ class T extends TestCase {
 		$o = new $class();
 		$this->assertTrue(is_object($o), 'Create empty object.');
 
-		$specs = array(
-			'name'	=> array(
+		$specs = [
+			'name'	=> [
 				'type'			=> 'string',
 				'max_length'	=> 2,
 				'max_length'	=> 30,
-			),
-			'birthdate' => array(
+			],
+			'birthdate' => [
 				'type'	=> 'string',
 				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
 				'before'	=> function(&$value) { # expect dd/mm/yyyy
@@ -58,29 +58,29 @@ class T extends TestCase {
 					}
 				},
 				'optional' => true,
-			),
-			'score' => array(
-				'types' => array('float', 'integer'),
+			],
+			'score' => [
+				'types' => ['float', 'integer'],
 				'max_value'	=> 10,
 				'min_value'	=> 0,
 				'_bla'		=> 'Options starting with an underscore should be silently ignored.',
-			),
-		);
-		$o = new $class(array(
+			],
+		];
+		$o = new $class([
 			'allow_extra'	=> false,
 			'delete_null'	=> false,
 			'null_empty_strings'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
-		));
+		]);
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
 		$this->assertEquals(true, $o->remove_extra, 'Read an attribute');
 	}
 
 	public function testValidate() {
-		$specs = array(
-			'name'	=> array(
+		$specs = [
+			'name'	=> [
 				'type'			=> 'string',
 				'max_length'	=> 2,
 				'max_length'	=> 30,
@@ -89,8 +89,8 @@ class T extends TestCase {
 						$value = strtoupper($value);
 					}
 				},
-			),
-			'birthdate' => array(
+			],
+			'birthdate' => [
 				'type'	=> 'string',
 				'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
 				'before'	=> function(&$value) { # expect dd/mm/yyyy
@@ -99,58 +99,58 @@ class T extends TestCase {
 					}
 				},
 				'optional' => true,
-			),
-			'score' => array(
-				'types' => array('float', 'integer'),
+			],
+			'score' => [
+				'types' => ['float', 'integer'],
 				'max_value'	=> 10,
 				'min_value'	=> 0,
-			),
-		);
-		$validator = new \Validate\Validator(array(
+			],
+		];
+		$validator = new \Validate\Validator([
 			'allow_extra'	=> false,
 			'delete_null'	=> true,
 			'null_empty_strings'	=> true,
 			#'prefix'
 			'remove_extra'	=> true,
 			'specs'			=> $specs,
-		));
-		$tests = array(
-			array(
-				'input'		=> array(
+		]);
+		$tests = [
+			[
+				'input'		=> [
 					'name'		=> 'Jane',
 					'birthdate'	=> '31/01/1984',
 					'score'		=> 7,
-				),
-				'expect'	=> array(
+				],
+				'expect'	=> [
 					'name'		=> 'JANE',
 					'birthdate'	=> '1984-01-31',
 					'score'		=> 7,
-				),
+				],
 				'expect_exception'	=> null,
-			),
-			array(
-				'input'		=> array(
+			],
+			[
+				'input'		=> [
 					'name'		=> 'Curt',
 					'birthdate'	=> '22/03/1983',
 					'score'		=> 9,
-				),
-				'expect'	=> array(
+				],
+				'expect'	=> [
 					'name'		=> 'CURT',
 					'birthdate'	=> '1983-03-22',
 					'score'		=> 9,
-				),
+				],
 				'expect_exception'	=> null,
-			),
-			array(
-				'input'		=> array(
+			],
+			[
+				'input'		=> [
 					'name'		=> 'Mike',
 					'birthdate'	=> '01/01/2000',
 					'score'		=> 'high',	# not allowed
-				),
+				],
 				'expect'	=> null,
 				'expect_exception'	=> 'Parameter "score" failed validation "types" for string value "high"',
-			),
-		);
+			],
+		];
 		foreach ($tests as $i => $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];
@@ -169,8 +169,8 @@ class T extends TestCase {
 	}
 
 	public function testValidatePosSpecCollection() {
-		$specs = array(
-			array(
+		$specs = [
+			[
 				'type'			=> 'string',
 				'max_length'	=> 2,
 				'max_length'	=> 30,
@@ -179,157 +179,157 @@ class T extends TestCase {
 						$value = strtoupper($value);
 					}
 				},
-			),
-			'score' => array(	# string keys are allowed too.
-				'types' => array('float', 'integer'),
+			],
+			'score' => [	# string keys are allowed too.
+				'types' => ['float', 'integer'],
 				'max_value'	=> 10,
 				'min_value'	=> 0,
-			),
-		);
-		$inputs = array(
-			'normal'			=> array('Jane', 7),
-			'too few params'	=> array('Jane'),
-			'too many params'	=> array('Jane', 7, '', 'bla'),
-			'invalid 2nd param (index 1)' => array('Mike', 'high'),
+			],
+		];
+		$inputs = [
+			'normal'			=> ['Jane', 7],
+			'too few params'	=> ['Jane'],
+			'too many params'	=> ['Jane', 7, '', 'bla'],
+			'invalid 2nd param (index 1)' => ['Mike', 'high'],
 			'no params'			=> [],
-		);
-		$tests = array(
-			'no options' => array(
+		];
+		$tests = [
+			'no options' => [
 				'options' => [],
-				'expects' => array(
-					'normal'	=> array(
-						'expect'			=> array('JANE', 7),
+				'expects' => [
+					'normal'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'too few params'	=> array(
+					],
+					'too few params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
-					),
-					'too many params'	=> array(
+					],
+					'too many params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Too many arguments given (4) for the number of specs (2)',
-					),
-					'invalid 2nd param (index 1)' => array(
+					],
+					'invalid 2nd param (index 1)' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
-					),
-					'no params' => array(
+					],
+					'no params' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
-					),
-				),
-			),
-			'allow_extra is true' => array(
-				'options' => array(
+					],
+				],
+			],
+			'allow_extra is true' => [
+				'options' => [
 					'allow_extra'	=> true,
-				),
-				'expects' => array(
-					'normal'	=> array(
-						'expect'			=> array('JANE', 7),
+				],
+				'expects' => [
+					'normal'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'too few params'	=> array(
+					],
+					'too few params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
-					),
-					'too many params'	=> array(
-						'expect'			=> array('JANE', 7, '', 'bla'),
+					],
+					'too many params'	=> [
+						'expect'			=> ['JANE', 7, '', 'bla'],
 						'expect_exception'	=> null,
-					),
-					'invalid 2nd param (index 1)' => array(
+					],
+					'invalid 2nd param (index 1)' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
-					),
-					'no params' => array(
+					],
+					'no params' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
-					),
-				),
-			),
-			'remove_extra is true' => array(
-				'options' => array(
+					],
+				],
+			],
+			'remove_extra is true' => [
+				'options' => [
 					'remove_extra'	=> true,
-				),
-				'expects' => array(
-					'normal'	=> array(
-						'expect'			=> array('JANE', 7),
+				],
+				'expects' => [
+					'normal'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'too few params'	=> array(
+					],
+					'too few params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
-					),
-					'too many params'	=> array(
-						'expect'			=> array('JANE', 7),
+					],
+					'too many params'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'invalid 2nd param (index 1)' => array(
+					],
+					'invalid 2nd param (index 1)' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
-					),
-					'no params' => array(
+					],
+					'no params' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
-					),
-				),
-			),
-			'allow_extra is true and remove_extra is true' => array(
-				'options' => array(
+					],
+				],
+			],
+			'allow_extra is true and remove_extra is true' => [
+				'options' => [
 					'allow_extra'	=> true,
 					'remove_extra'	=> true,
-				),
-				'expects' => array(
-					'normal'	=> array(
-						'expect'			=> array('JANE', 7),
+				],
+				'expects' => [
+					'normal'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'too few params'	=> array(
+					],
+					'too few params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
-					),
-					'too many params'	=> array(
-						'expect'			=> array('JANE', 7),
+					],
+					'too many params'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'invalid 2nd param (index 1)' => array(
+					],
+					'invalid 2nd param (index 1)' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
-					),
-					'no params' => array(
+					],
+					'no params' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
-					),
-				),
-			),
-			'allow_extra is true and null_empty_strings is true' => array(
-				'options' => array(
+					],
+				],
+			],
+			'allow_extra is true and null_empty_strings is true' => [
+				'options' => [
 					'allow_extra'	=> true,
 					'null_empty_strings'	=> true,
-				),
-				'expects' => array(
-					'normal'	=> array(
-						'expect'			=> array('JANE', 7),
+				],
+				'expects' => [
+					'normal'	=> [
+						'expect'			=> ['JANE', 7],
 						'expect_exception'	=> null,
-					),
-					'too few params'	=> array(
+					],
+					'too few params'	=> [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "mandatory" for NULL value',
-					),
-					'too many params'	=> array(
-						'expect'			=> array('JANE', 7, null, 'bla'),
+					],
+					'too many params'	=> [
+						'expect'			=> ['JANE', 7, null, 'bla'],
 						'expect_exception'	=> null,
-					),
-					'invalid 2nd param (index 1)' => array(
+					],
+					'invalid 2nd param (index 1)' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "1" failed validation "types" for string value "high"',
-					),
-					'no params' => array(
+					],
+					'no params' => [
 						'expect'			=> null,
 						'expect_exception'	=> 'Parameter "0" failed validation "mandatory" for NULL value',
-					),
-				),
-			),
-		);
+					],
+				],
+			],
+		];
 		foreach ($tests as $name => $test) {
 			$args = $test['options'];
 			$args['specs'] = $specs;

@@ -12,37 +12,37 @@ $specs = [];
 
 
 # This is the proper way to create a Spec object with it's embedded Validation object.
-$specs []= new Validate\Spec(array(
+$specs []= new Validate\Spec([
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
 	'optional'		=> false,
-	'validation'	=> (new Validate\Validation(array(
+	'validation'	=> (new Validate\Validation([
 		'mb_max_length'	=> 10,
 		'regex'			=> '/a/',
-		'callbacks'		=> array(
+		'callbacks'		=> [
 			'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
-		),
-	))),
-));
+		],
+	])),
+]);
 
 
 # This is the lazy way to create a Spec object. It'll automatically convert the 'validation' array into a Validation object internally.
-$specs []= new Validate\Spec(array(
+$specs []= new Validate\Spec([
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
 	'optional'		=> false,
-	'validation'	=> array(
+	'validation'	=> [
 		'mb_max_length'	=> 10,
 		'regex'			=> '/a/',
-		'callbacks'		=> array(
+		'callbacks'		=> [
 			'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
-		),
-	),
-));
+		],
+	],
+]);
 
 
 # This is the very lazy way to create a Spec object. It'll automatically create a Validation object internally.
-$specs []= new Validate\Spec(array(
+$specs []= new Validate\Spec([
 	# Spec options:
 	'allow_empty'	=> false,
 	'description'	=> 'String with a lowercase "a"',
@@ -51,10 +51,10 @@ $specs []= new Validate\Spec(array(
 	# Validation options:
 	'mb_max_length'	=> 10,
 	'regex'			=> '/a/',
-	'callbacks'		=> array(
+	'callbacks'		=> [
 		'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
-	),
-));
+	],
+]);
 
 
 # Check if all the Spec objects are indeed identical:
@@ -64,36 +64,36 @@ if (count(array_unique(array_map(function($spec) { return var_export($spec,true)
 
 
 
-$tests = array(
-	'This is too long.' => array(
+$tests = [
+	'This is too long.' => [
 		'input'		=> 'This is too long.',
 		'expect'	=> false,
-	),
-	'this is also too long.' => array(
+	],
+	'this is also too long.' => [
 		'input'		=> 'this is also too long.',
 		'expect'	=> false,
-	),
-	'Yaba' => array(
+	],
+	'Yaba' => [
 		'input'		=> 'Yaba',
 		'expect'	=> false,
-	),
-	'gogo' => array(
+	],
+	'gogo' => [
 		'input'		=> 'gogo',
 		'expect'	=> false,
-	),
-	'bla' => array(
+	],
+	'bla' => [
 		'input'		=> 'bla',
 		'expect'	=> true,
-	),
-	'null'	=> array(
+	],
+	'null'	=> [
 		'input'		=> null,
 		'expect'	=> false,
-	),
-	'empty string'	=> array(
+	],
+	'empty string'	=> [
 		'input'		=> '',
 		'expect'	=> false,
-	),
-);
+	],
+];
 
 
 $spec = reset($specs);

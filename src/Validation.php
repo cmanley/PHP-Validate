@@ -112,7 +112,7 @@ class Validation {
 					}
 					$this->$key = $value;
 				}
-				elseif (in_array($key, array('max_length', 'min_length', 'mb_max_length', 'mb_min_length'))) {
+				elseif (in_array($key, ['max_length', 'min_length', 'mb_max_length', 'mb_min_length'])) {
 					if (!((is_int($value) || ctype_digit($value))) && ($value >= 0)) {
 						throw new \InvalidArgumentException("The \"$key\" argument must be an unsigned integer.");
 					}
@@ -150,7 +150,7 @@ class Validation {
 						$this->types []= $value;
 					}
 					else {
-						$this->types = array($value);
+						$this->types = [$value];
 					}
 				}
 				elseif ($key == 'types') {

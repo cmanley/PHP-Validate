@@ -7,13 +7,13 @@ require_once(__DIR__ . '/../src/Validator.php');
 
 
 # Define the validation specs
-$specs = array(
-	'name'	=> array(
+$specs = [
+	'name'	=> [
 		'type'			=> 'string',
 		'max_length'	=> 2,
 		'max_length'	=> 30,
-	),
-	'birthdate' => array(
+	],
+	'birthdate' => [
 		'type'	=> 'string',
 		'regex'	=> '/^\d{4}-[01]\d-[0-3]\d$/', # should be yyyy-mm-dd
 		'before'	=> function(&$value) { # expect dd/mm/yyyy
@@ -22,34 +22,34 @@ $specs = array(
 			}
 		},
 		'optional' => true,
-	),
-	'score' => array(
-		'types' => array('float', 'integer'),
+	],
+	'score' => [
+		'types' => ['float', 'integer'],
 		'max_value'	=> 10,
 		'min_value'	=> 0,
-	),
-);
+	],
+];
 
 
 # Create a Validator
-$validator = new Validate\Validator(array(
+$validator = new Validate\Validator([
 	'specs' => $specs,
-));
+]);
 
 
 # Define records to test
-$records = array(
-	array(
+$records = [
+	[
 		'name'		=> 'Jane',
 		'birthdate'	=> '31/01/1984',
 		'score'		=> 7,
-	),
-	array(
+	],
+	[
 		'name'		=> 'Curt',
 		'birthdate'	=> '22/03/1983',
 		'score'		=> 9,
-	),
-);
+	],
+];
 
 
 # Validate the records

@@ -102,7 +102,7 @@ class Spec {
 	*/
 	public function __construct(array $args = null) {
 		if ($args) {
-			$boolean_options = array('allow_empty', 'optional', 'trim');
+			$boolean_options = ['allow_empty', 'optional', 'trim'];
 			$unknown_args = [];
 			foreach ($args as $key => $value) {
 				if ($key == 'validation') {
@@ -308,7 +308,7 @@ class Spec {
 		}
 		else {
 			if (!is_null($arg) && $this->before) {
-				$x = call_user_func_array($this->before, array(&$arg)); # possible return values are: false, null (void)
+				$x = call_user_func_array($this->before, [&$arg]); # possible return values are: false, null (void)
 				if ($x === false) {
 					$this->last_failure = 'callback before';
 					return false;
@@ -344,7 +344,7 @@ class Spec {
 					}
 				}
 				if ($this->after) {
-					$x = call_user_func_array($this->after, array(&$arg)); # possible return values are: false, null (void)
+					$x = call_user_func_array($this->after, [&$arg]); # possible return values are: false, null (void)
 					if ($x === false) {
 						$this->last_failure = 'callback after';
 						return false;

@@ -6,35 +6,35 @@
 require_once(__DIR__ . '/../src/Validation.php');
 
 
-$validation = new Validate\Validation(array(
+$validation = new Validate\Validation([
 	'mb_max_length'	=> 10,
 	'regex'			=> '/a/',
-	'callbacks'		=> array(
+	'callbacks'		=> [
 		'is_lc'	=> function($s) { return strtolower($s) == $s; },
-	),
-));
-$tests = array(
-	array(
+	],
+]);
+$tests = [
+	[
 		'data'		=> 'This is too long.',
 		'expect'	=> false,
-	),
-	array(
+	],
+	[
 		'data'		=> 'this is also too long.',
 		'expect'	=> false,
-	),
-	array(
+	],
+	[
 		'data'		=> 'Yaba',
 		'expect'	=> false,
-	),
-	array(
+	],
+	[
 		'data'		=> 'gogo',
 		'expect'	=> false,
-	),
-	array(
+	],
+	[
 		'data'		=> 'bla',
 		'expect'	=> true,
-	),
-);
+	],
+];
 
 foreach ($tests as $test) {
 	$data = $test['data'];

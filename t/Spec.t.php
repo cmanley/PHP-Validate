@@ -25,7 +25,7 @@ class T extends TestCase {
 
     public function testMethodsExist() {
 		$class = static::CLASS_NAME;
-		$methods = array(
+		$methods = [
 			# public
 			'__construct',
 			'__get',
@@ -42,7 +42,7 @@ class T extends TestCase {
 			'getLastFailure',
 			'validate',
 			'validate_ex',
-		);
+		];
 		foreach ($methods as $method) {
 			$this->assertTrue(method_exists($class, $method), "Check method $class::$method() exists.");
 		}
@@ -52,71 +52,71 @@ class T extends TestCase {
 		$class = static::CLASS_NAME;
 		$o = new $class();
 		$this->assertTrue(is_object($o), 'Create empty object.');
-		$o = new $class(array(
+		$o = new $class([
 			'allow_empty'	=> false,
 			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'after'			=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'default'		=> 'nobody@home.com',
 			'description'	=> 'Email address',
 			'optional'		=> true,
-			'validation'	=> new \Validate\Validation(array(
+			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
 				'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 				'mb_max_length'	=> 50,
-			)),
+			]),
 			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
-		));
+		]);
 		$this->assertTrue(is_object($o), 'Create object with all supported parameters.');
 		$this->assertEquals(false, $o->allow_empty, 'Read an attribute');
 	}
 
 	public function testValidate() {
-		$spec = new \Validate\Spec(array(
+		$spec = new \Validate\Spec([
 			'allow_empty'	=> false,
 			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
 			'description'	=> 'Email address',
-			'validation'	=> new \Validate\Validation(array(
+			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
-				'callbacks'		=> array(
+				'callbacks'		=> [
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
-				),
+				],
 				'mb_max_length'	=> 50,
-			)),
-		));
-		$tests = array(
-			array(
+			]),
+		]);
+		$tests = [
+			[
 				'input'		=> 'user@hotmail.com',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'no_hotmail (callback)',
-			),
-			array(
+			],
+			[
 				'input'		=> 'bgates@microsoftcom',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'syntax (callback)',
-			),
-			array(
+			],
+			[
 				'input'		=> 'user@outlook.com',
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-			array(
+			],
+			[
 				'input'		=> null,
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mandatory',
-			),
-			array(
+			],
+			[
 				'input'		=> 'billy_bob_gates_the_boss@at_a_very_very_long_domain_name.com',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mb_max_length',
-			),
-			array(
+			],
+			[
 				'input'		=> 12345,
 				'expect'	=> false,
 				'expect_last_failure'	=> 'types',
-			),
-		);
+			],
+		];
 		foreach ($tests as $k => $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];
@@ -127,37 +127,37 @@ class T extends TestCase {
 	}
 
 	public function testValidateWithDefault() {
-		$spec = new \Validate\Spec(array(
+		$spec = new \Validate\Spec([
 			'allow_empty'	=> false,
 			'after'			=> function(&$x) { $x = mb_strtolower($x); },
 			'description'	=> 'Email address',
 			'default'		=> 'nobody',	# defaults aren't validated as they are trusted values
-			'validation'	=> new \Validate\Validation(array(
+			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
-				'callbacks'		=> array(
+				'callbacks'		=> [
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
-				),
+				],
 				'mb_max_length'	=> 50,
-			)),
-		));
-		$tests = array(
-			array(
+			]),
+		]);
+		$tests = [
+			[
 				'input'		=> 'user@outlook.com',
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-			array(
+			],
+			[
 				'input'		=> null,
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-			array(
+			],
+			[
 				'input'		=> '',
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-		);
+			],
+		];
 		foreach ($tests as $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];
@@ -170,24 +170,24 @@ class T extends TestCase {
 	}
 
 	public function testReturnValuesBeforeAfter() {
-		foreach (array('before', 'after') as $when) {
-			$spec = new \Validate\Spec(array(
+		foreach (['before', 'after'] as $when) {
+			$spec = new \Validate\Spec([
 				$when			=> function(&$x) {},	# void (null) result
-			));
+			]);
 			$input = 'anything';
 			$this->assertTrue($spec->validate($input), "Using callback '$when' with void return value validates as true.");
 			$this->assertEquals(null, $spec->getLastFailure(), 'Check last failure');
 
-			$spec = new \Validate\Spec(array(
+			$spec = new \Validate\Spec([
 				$when			=> function(&$x) { return false; },
-			));
+			]);
 			$input = 'anything';
 			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as FALSE.");
 			$this->assertEquals("callback $when", $spec->getLastFailure(), 'Check last failure');
 
-			$spec = new \Validate\Spec(array(
+			$spec = new \Validate\Spec([
 				$when			=> function(&$x) { $x = strtoupper($x); return true; },
-			));
+			]);
 			$input = 'anything';
 			$this->assertTrue($spec->validate($input), "Using callback '$when' with TRUE return value validates as TRUE.");
 			$this->assertEquals($input, 'ANYTHING', "'$when' callback modified variable passed by reference.");
@@ -201,52 +201,52 @@ class T extends TestCase {
 if (isset($argv)) {
 	require_once(__DIR__ . '/' . T::FILE_NAME);
 	if (1) {
-		$spec = new \Validate\Spec(array(
+		$spec = new \Validate\Spec([
 			'allow_empty'	=> false,
 			'before'		=> function(&$x) { if (is_string($x)) { $x = mb_strtolower($x); } },
 			'after'			=> function(&$x) { if (is_string($x)) { $x = ucfirst($x); } },
 			'description'	=> 'Email address',
-			'validation'	=> new \Validate\Validation(array(
+			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
-				'callbacks'		=> array(
+				'callbacks'		=> [
 					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
 					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
-				),
+				],
 				'mb_max_length'	=> 50,
-			)),
-		));
-		$tests = array(
-			array(
+			]),
+		]);
+		$tests = [
+			[
 				'input'		=> 'user@hotmail.com',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'no_hotmail (callback)',
-			),
-			array(
+			],
+			[
 				'input'		=> 'bgates@microsoftcom',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'syntax (callback)',
-			),
-			array(
+			],
+			[
 				'input'		=> 'user@outlook.com',
 				'expect'	=> true,
 				'expect_last_failure'	=> null,
-			),
-			array(
+			],
+			[
 				'input'		=> null,
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mandatory',
-			),
-			array(
+			],
+			[
 				'input'		=> 'billy_bob_gates_the_boss@at_a_very_very_long_domain_name.com',
 				'expect'	=> false,
 				'expect_last_failure'	=> 'mb_max_length',
-			),
-			array(
+			],
+			[
 				'input'		=> 12345,
 				'expect'	=> false,
 				'expect_last_failure'	=> 'types',
-			),
-		);
+			],
+		];
 		foreach ($tests as $test) {
 			$input	= $test['input'];
 			$expect	= $test['expect'];
