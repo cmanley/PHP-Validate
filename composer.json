@@ -18,5 +18,8 @@
 		"psr-4": {
 			"Validate\\": "src/"
 		}
+	},
+	"require-dev": {
+		"rector/rector": "^2.3"
 	}
 }

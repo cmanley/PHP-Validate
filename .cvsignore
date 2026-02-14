@@ -1,3 +1,5 @@
 .git
+.rector-cache
 docs
 md
+vendor
