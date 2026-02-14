@@ -37,7 +37,15 @@ class NamedValueException extends ValueException {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
-			$message = 'Parameter "' . $name . '" failed validation "' . $check . '" for ' . gettype($this->value) . ' value';
+			$type_of_value = gettype($this->value);
+			if (is_object($value)) {
+				$type_of_value = get_class($value) . ' ' . $type_of_value;
+				# Unfortunately, this method does not have access to the expected value in the case of 'isa' checks.
+			}
+			else {
+				$type_of_value .= ' value';
+			}
+			$message = 'Parameter "' . $name . '" failed "' . $check . '" validation for ' . $type_of_value;
 			if (is_scalar($value)) {
 				$message .= ' ' . $this->getStringPlaceholderValue();
 			}
