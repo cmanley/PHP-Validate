@@ -9,7 +9,7 @@ if (isset($argv)) {
 
 class T extends TestCase {
 
-	const CLASS_NAME = 'Validate\\Validator';
+	const CLASS_NAME = \Validate\Validator::class;
 	const FILE_NAME = '../src/Validator.php';
 
     public function testRequire() {

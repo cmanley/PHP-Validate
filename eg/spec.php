@@ -20,7 +20,7 @@ $specs []= new Validate\Spec([
 		'mb_max_length'	=> 10,
 		'regex'			=> '/a/',
 		'callbacks'		=> [
-			'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
+			'is_lc'	=> fn($s) => mb_strtolower($s) == $s,
 		],
 	])),
 ]);
@@ -35,7 +35,7 @@ $specs []= new Validate\Spec([
 		'mb_max_length'	=> 10,
 		'regex'			=> '/a/',
 		'callbacks'		=> [
-			'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
+			'is_lc'	=> fn($s) => mb_strtolower($s) == $s,
 		],
 	],
 ]);
@@ -52,13 +52,13 @@ $specs []= new Validate\Spec([
 	'mb_max_length'	=> 10,
 	'regex'			=> '/a/',
 	'callbacks'		=> [
-		'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
+		'is_lc'	=> fn($s) => mb_strtolower($s) == $s,
 	],
 ]);
 
 
 # Check if all the Spec objects are indeed identical:
-if (count(array_unique(array_map(function($spec) { return var_export($spec,true); }, $specs))) != 1) {
+if (count(array_unique(array_map(fn($spec) => var_export($spec,true), $specs))) != 1) {
 	die("The Spec objects are not identical!\n");
 }
 

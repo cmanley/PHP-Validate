@@ -9,7 +9,7 @@ if (isset($argv)) {
 
 class T extends TestCase {
 
-	const CLASS_NAME = 'Validate\\Spec';
+	const CLASS_NAME = \Validate\Spec::class;
 	const FILE_NAME = '../src/Spec.php';
 
     public function testRequire() {
@@ -61,7 +61,7 @@ class T extends TestCase {
 			'optional'		=> true,
 			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
-				'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
+				'callback'		=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
 				'mb_max_length'	=> 50,
 			]),
 			'_bla'			=> 'Options starting with an underscore should be silently ignored.',
@@ -79,8 +79,8 @@ class T extends TestCase {
 			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
 				'callbacks'		=> [
-					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
-					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
+					'syntax'		=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
+					'no_hotmail'	=> fn($x) => !preg_match('/@hotmail\.com$/', $x),
 				],
 				'mb_max_length'	=> 50,
 			]),
@@ -135,8 +135,8 @@ class T extends TestCase {
 			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
 				'callbacks'		=> [
-					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
-					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
+					'syntax'		=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
+					'no_hotmail'	=> fn($x) => !preg_match('/@hotmail\.com$/', $x),
 				],
 				'mb_max_length'	=> 50,
 			]),
@@ -179,7 +179,7 @@ class T extends TestCase {
 			$this->assertEquals(null, $spec->getLastFailure(), 'Check last failure');
 
 			$spec = new \Validate\Spec([
-				$when			=> function(&$x) { return false; },
+				$when			=> fn(&$x) => false,
 			]);
 			$input = 'anything';
 			$this->assertTrue(!$spec->validate($input), "Using callback '$when' with FALSE return value validates as FALSE.");
@@ -209,8 +209,8 @@ if (isset($argv)) {
 			'validation'	=> new \Validate\Validation([
 				'type'			=> 'string',
 				'callbacks'		=> [
-					'syntax'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
-					'no_hotmail'	=> function($x) { return !preg_match('/@hotmail\.com$/', $x); },
+					'syntax'		=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
+					'no_hotmail'	=> fn($x) => !preg_match('/@hotmail\.com$/', $x),
 				],
 				'mb_max_length'	=> 50,
 			]),

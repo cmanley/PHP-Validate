@@ -100,7 +100,7 @@ class Spec {
 	* @param array $args associative array of options
 	* @throws \InvalidArgumentException
 	*/
-	public function __construct(array $args = null) {
+	public function __construct(?array $args = null) {
 		if ($args) {
 			$boolean_options = ['allow_empty', 'optional', 'trim'];
 			$unknown_args = [];

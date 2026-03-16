@@ -9,7 +9,7 @@ error_reporting(error_reporting() | E_DEPRECATED);
 
 class T extends TestCase {
 
-	const CLASS_NAME = 'Validate\\SpecCollection';
+	const CLASS_NAME = \Validate\SpecCollection::class;
 	const FILE_NAME = '../src/SpecCollection.php';
 
     public function testRequire() {

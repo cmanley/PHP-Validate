@@ -10,7 +10,7 @@ error_reporting(error_reporting() | E_DEPRECATED);
 
 class T extends TestCase {
 
-	const CLASS_NAME = 'Validate\\Validation';
+	const CLASS_NAME = \Validate\Validation::class;
 	const FILE_NAME = '../src/Validation.php';
 
     public function testRequire() {
@@ -47,10 +47,10 @@ class T extends TestCase {
 			# Some of these validations contradict each other, but it's merely a test
 			'allowed_values_nc'	=> ['one@two.com', 'two@three.com'],
 			'callbacks'			=> [	 # associative array of key => callback pairs
-				'syntax'	=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
-				'mx'		=> function($x) { return true; },	# dummy check
+				'syntax'	=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
+				'mx'		=> fn($x) => true,	# dummy check
 			],
-			'callback'		=> function($x) { return filter_var($x, FILTER_VALIDATE_EMAIL); },
+			'callback'		=> fn($x) => filter_var($x, FILTER_VALIDATE_EMAIL),
 			'isa'			=> 'StdClass',
 			'mb_max_length'	=> 50,
 			'mb_min_length'	=> 3,
@@ -71,7 +71,7 @@ class T extends TestCase {
 	public function testValidate() {
 		$validation = new \Validate\Validation([
 			'callbacks'		=> [
-				'is_lc'	=> function($s) { return mb_strtolower($s) == $s; },
+				'is_lc'	=> fn($s) => mb_strtolower($s) == $s,
 			],
 			'mb_max_length'	=> 10,
 			'regex'			=> '/a/',

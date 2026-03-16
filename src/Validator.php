@@ -117,7 +117,7 @@ class Validator {
 	* @param array $args
 	* @throws \InvalidArgumentException
 	*/
-	public function __construct(array $args = null) {
+	public function __construct(?array $args = null) {
 		if ($args) {
 			$boolean_options = [
 				'allow_extra',

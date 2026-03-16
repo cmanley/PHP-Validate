@@ -79,7 +79,7 @@ $specs_proper = new Validate\SpecCollection([
 
 
 # Check if all the Spec objects are indeed identical:
-if (count(array_unique(array_map(function($specs) { return var_export($specs,true); }, [$specs_easy, $specs_lazy, $specs_proper] ))) != 1) {
+if (count(array_unique(array_map(fn($specs) => var_export($specs,true), [$specs_easy, $specs_lazy, $specs_proper] ))) != 1) {
 	die("The SpecCollection objects are not identical!\n");
 }
 

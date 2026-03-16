@@ -32,7 +32,7 @@ class NamedValueException extends ValueException {
 	* @param mixed $value the value that isn't valid
 	* @param string $message optional custom message
 	*/
-	public function __construct(string $name, string $check, $value, string $message = null) {
+	public function __construct(string $name, string $check, $value, ?string $message = null) {
 		$this->name  = $name;
 		$this->check = $check;
 		$this->value = $value;

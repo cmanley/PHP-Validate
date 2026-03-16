@@ -73,7 +73,7 @@ class Validation {
 	* @param array $args associative array of validations
 	* @throws \InvalidArgumentException
 	*/
-	public function __construct(array $args = null) {
+	public function __construct(?array $args = null) {
 		if ($args) {
 			foreach ($args as $key => $value) {
 				# Process validations:
@@ -330,7 +330,7 @@ class Validation {
 			}
 			elseif (is_array($value)) {	# do all the given values in $value appear in allowed_values_nc?
 				if ($value) {
-					$values_lc = array_map(function($x) { return is_string($x) ? \mb_strtolower($x) : $x; }, $value);
+					$values_lc = array_map(fn($x) => is_string($x) ? \mb_strtolower($x) : $x, $value);
 					if (count($value) != count(array_intersect($values_lc, $this->_allowed_values_nc_lowercased))) {
 						$this->last_failure = $k;
 						return false;

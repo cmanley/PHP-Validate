@@ -30,7 +30,7 @@ class ValueException extends ValidationException {
 	* @param mixed $value the value that isn't valid
 	* @param string $message optional custom message
 	*/
-	public function __construct(string $check, $value, string $message = null) {
+	public function __construct(string $check, $value, ?string $message = null) {
 		$this->check = $check;
 		$this->value = $value;
 		if (is_null($message)) {
